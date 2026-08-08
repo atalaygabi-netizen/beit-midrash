@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>בית המדרש מבקשי פניך</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-dark: #0f172a;
+            --accent: #f59e0b;
+            --bg: #030712;
+            --card-bg: #111827;
+            --text-light: #f9fafb;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; touch-action: manipulation; }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            direction: rtl;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a, #030712);
+            padding: 6px 20px;
+            border-bottom: 2px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-size: 1.5rem;
+        }
+
+        header p {
+            margin: 1px 0 0 0;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        /* כפתור הגדרות קטן בפינה עם מרווח בטוח מלחיצות מערכת בנייד */
+        .corner-settings-btn {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            width: 42px;
+            height: 42px;
+            background: rgba(245, 158, 11, 0.95);
+            border-radius: 12px;
+            cursor: pointer;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .time-progress-container {
+            width: 100%;
+            height: 5px;
+            background: #1f2937;
+            position: relative;
+            z-index: 15;
+        }
+
+        .time-progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.05s linear;
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .main-display {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 8px; bottom: 8px; left: 8px; right: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            border: 1px solid #1f2937;
+        }
+
+        .slide.active { opacity: 1; visibility: visible; }
+
+        .slide-title {
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 4px;
+            width: 100%;
+        }
+
+        .shiur-info-bar {
+            background: #1e293b;
+            width: 100%;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #f59e0b;
+            border: 1px solid #374151;
+        }
+
+        .shiur-info-bar span { color: #ffffff; }
+
+        .times-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 75vh;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .shabbat-slide-content {
+            display: flex;
+            flex-direction: column;
+            width: 95%;
+            max-width: 1400px;
+            gap: 6px;
+            max-height: 78vh;
+            justify-content: center;
+        }
+
+        .shabbat-section-title {
+            font-size: 1rem;
+            color: #60a5fa;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 2px;
+            margin: 2px 0;
+            font-weight: bold;
+        }
+
+        .shabbat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 6px;
+            width: 100%;
+        }
+
+        .time-box-compact {
+            background: #030712;
+            padding: 8px 6px;
+            border-radius: 8px;
+            text-align: center;
+            border-right: 4px solid var(--accent);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+        }
+
+        .time-box-compact h3 { margin: 0 0 2px 0; font-size: 0.8rem; color: #d1d5db; }
+        .time-box-compact .time-val { font-weight: 900; font-size: 1.1rem; color: #ffffff; }
+
+        .time-box {
+            background: #030712;
+            padding: 12px 8px;
+            border-radius: 12px;
+            text-align: center;
+            border-right: 5px solid var(--accent);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .time-box h3 { margin: 0 0 4px 0; font-size: 0.9rem; }
+        .time-box .time-val { font-weight: 900; font-size: 1.5rem; }
+
+        .halacha-box {
+            background: #030712;
+            padding: 20px 25px;
+            border-radius: 14px;
+            border-right: 6px solid var(--accent);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+            width: 95%;
+            max-width: 1400px;
+            line-height: 1.5;
+            text-align: justify;
+            max-height: 72vh;
+            overflow-y: auto;
+        }
+
+        .custom-box {
+            background: #030712;
+            padding: 25px;
+            border-radius: 16px;
+            border-right: 6px solid var(--accent);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 1400px;
+            font-size: 1.6rem;
+            line-height: 1.5;
+            color: #f9fafb;
+            text-align: center;
+            max-height: 72vh;
+            overflow-y: auto;
+        }
+
+        .image-display {
+            width: 100%;
+            height: calc(100% - 35px);
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .admin-modal, .password-modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .admin-modal.open, .password-modal.open { display: flex; }
+
+        .modal-content {
+            background: #111827;
+            color: #f9fafb;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #374151;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--accent);
+            border-bottom: 2px solid #374151;
+            padding-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        .admin-section {
+            background: #030712;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #1f2937;
+        }
+
+        .admin-section h3 { margin-top: 0; color: #60a5fa; font-size: 1.3rem; }
+
+        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
+
+        input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            background: #111827;
+            color: white;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        input[type="color"] { height: 42px; padding: 2px; cursor: pointer; }
+        textarea { resize: vertical; min-height: 100px; font-family: inherit; }
+
+        .btn-action {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .btn-danger { background: #dc2626; }
+        .btn-success { background: #10b981; }
+        .btn-info { background: #0284c7; }
+        .btn-warning { background: #d97706; }
+
+        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card {
+            background: #111827;
+            border: 1px solid #374151;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-admin-item {
+            display: grid;
+            grid-template-columns: 3fr auto auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: #111827;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- כפתור הגדרות מעודכן עם מרווח בטוח מלחיצות מערכת -->
+    <div class="corner-settings-btn" id="settingsBtn" title="הגדרות מנהל">⚙️</div>
+
+    <!-- חלון הזנת סיסמה -->
+    
+
+    <header id="mainHeader" style="text-align: center;">
+        <h1 id="headerTitle" style="font-size: 1.6rem;">בית המדרש "מבקשי פניך"</h1>
+        <p id="headerSubtitle">תורה • תפילה • גמילות חסדים</p>
+    </header>
+
+    <div class="time-progress-container">
+        <div class="time-progress-bar" id="timeProgressBar" style="width: 20%;"></div>
+    </div>
+
+    <div class="main-display" id="mainDisplay"><div class="slide active">
+                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">זמני תפילות ימי חול</div>
+                        <div class="times-grid">
+                <div class="time-box">
+                    <h3 style="color:#d1d5db;">שחרית</h3>
+                    <div class="time-val" style="color:#ffffff;">06:30</div>
+                </div>
+            
+                <div class="time-box">
+                    <h3 style="color:#d1d5db;">מנחה</h3>
+                    <div class="time-val" style="color:#ffffff;">19:00</div>
+                </div>
+            
+                <div class="time-box">
+                    <h3 style="color:#d1d5db;">ערבית</h3>
+                    <div class="time-val" style="color:#ffffff;">19:45</div>
+                </div>
+            </div>
+                    </div><div class="slide">
+                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">זמני שבת קודש - פרשת השבוע</div>
+                        <div class="shabbat-slide-content">
+                            <div class="shabbat-section-title">🕯️ יום שישי</div>
+                            <div class="shabbat-grid">
+                <div class="time-box-compact">
+                    <h3>כניסת שבת</h3>
+                    <div class="time-val">18:45</div>
+                </div>
+            </div>
+                            <div class="shabbat-section-title">☀️ יום שבת</div>
+                            <div class="shabbat-grid">
+                <div class="time-box-compact">
+                    <h3>שחרית שבת</h3>
+                    <div class="time-val">08:30</div>
+                </div>
+            
+                <div class="time-box-compact">
+                    <h3>צאת השבת</h3>
+                    <div class="time-val">19:42</div>
+                </div>
+            </div>
+                        </div>
+                    </div><div class="slide">
+                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">הלכה יומית</div>
+                        <div class="halacha-box" style="font-size: 1.8rem; color: #f9fafb; font-style: normal;">אמר רבי אלעזר אמר רבי חנינא, תלמידי חכמים מרבים שלום בעולם, שנאמר וכל בניך לימודי ה' ורב שלום בניך.</div>
+                    </div></div>
+
+    
+
+    <script>
+        const ADMIN_PASSWORD = "1234"; // סיסמת הניהול
+
+        // טיפול ממוקד בלחיצה ובמגע עם עצירת זליגת אירועים למערכת ההחלקה
+        const btn = document.getElementById('settingsBtn');
+        
+        function handleSettingsClick(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            openPasswordModal();
+        }
+
+        btn.addEventListener('click', handleSettingsClick);
+        btn.addEventListener('touchend', handleSettingsClick);
+
+        function openPasswordModal() {
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('passwordModal').classList.add('open');
+            isPaused = true;
+            setTimeout(() => { document.getElementById('adminPasswordInput').focus(); }, 100);
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('open');
+            isPaused = false;
+        }
+
+        function verifyAdminPassword() {
+            let pass = document.getElementById('adminPasswordInput').value;
+            if (pass === ADMIN_PASSWORD) {
+                closePasswordModal();
+                openAdminModal();
+            } else {
+                alert("סיסמה שגויה!");
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') { nextSlide(); }
+            else if (e.key === 'ArrowLeft') { prevSlide(); }
+            else if (e.key === 'F2') { openPasswordModal(); }
+        });
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        window.addEventListener('touchstart', function(e) {
+            if (e.target.closest('.admin-modal') || e.target.closest('.password-modal') || e.target.closest('.corner-settings-btn')) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', function(e) {
+            if (e.target.closest('.admin-modal') || e.target.closest('.password-modal') || e.target.closest('.corner-settings-btn')) return;
+            let touchEndX = e.changedTouches[0].clientX;
+            let touchEndY = e.changedTouches[0].clientY;
+            
+            let diffX = touchStartX - touchEndX;
+            let diffY = Math.abs(touchStartY - touchEndY);
+
+            if (Math.abs(diffX) > 50 && diffY < 100) {
+                if (diffX > 0) { nextSlide(); } else { prevSlide(); }
+            } else if (Math.abs(diffX) < 10 && diffY < 10) {
+                let screenWidth = window.innerWidth;
+                if (touchEndX > screenWidth / 2) { nextSlide(); } else { prevSlide(); }
+            }
+        }, { passive: true });
+
+        const autoHalachot = [
+            "אמר רבי אלעזר אמר רבי חנינא, תלמידי חכמים מרבים שלום בעולם, שנאמר וכל בניך לימודי ה' ורב שלום בניך.",
+            "טוב לימוד התורה עם דרך ארץ, שיגעשת שניהם משכנת עוון.",
+            "הוי זנאי לכל אדם בקדמת שלום, והיה מקבל את כל האדם בסבר פנים יפות.",
+            "על שלושה דברים העולם עומד: על התורה, ועל העבודה, ועל גמילות חסדים."
+        ];
+
+        function getDailyHalacha() {
+            const custom = localStorage.getItem('mp_halacha');
+            if (custom && custom.trim() !== '') return custom;
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            return autoHalachot[dayOfYear % autoHalachot.length];
+        }
+
+        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || { minBefore: 20 };
+
+        function checkAndApplyWeeklySunset() {
+            try {
+                const now = new Date();
+                const currentWeekNumber = getWeekNumber(now);
+                const savedWeekData = JSON.parse(localStorage.getItem('mp_weekly_sunset_data')) || {};
+
+                if (savedWeekData.weekNum === currentWeekNumber && savedWeekData.time) {
+                    applyCalculatedMinchaTime(savedWeekData.time, savedWeekData.sunset);
+                    return;
+                }
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        try {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            const sunsetDate = calculateSunset(now, lat, lon);
+                            if (sunsetDate) {
+                                let hours = sunsetDate.getHours();
+                                let minutes = sunsetDate.getMinutes();
+                                let totalMin = (hours * 60) + minutes - sunsetConfig.minBefore;
+                                let mHours = Math.floor(totalMin / 60);
+                                let mMinutes = totalMin % 60;
+                                let sunsetStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                                let minTimeStr = `${String(mHours).padStart(2, '0')}:${String(mMinutes).padStart(2, '0')}`;
+
+                                localStorage.setItem('mp_weekly_sunset_data', JSON.stringify({
+                                    weekNum: currentWeekNumber,
+                                    time: minTimeStr,
+                                    sunset: sunsetStr
+                                }));
+                                applyCalculatedMinchaTime(minTimeStr, sunsetStr);
+                            }
+                        } catch (err) {}
+                    }, () => {}, { timeout: 3000 });
+                }
+            } catch (e) {}
+        }
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            return `${d.getUTCFullYear()}-W${Math.ceil((((d - yearStart) / 86400000) + 1)/7)}`;
+        }
+
+        function applyCalculatedMinchaTime(minchaStr, sunsetStr) {
+            weekdayTimes.forEach(item => {
+                if (item.title.includes('מנחה')) item.time = minchaStr;
+            });
+            const statusElem = document.getElementById('sunsetStatusText');
+            if(statusElem) statusElem.value = `שקיעה: ${sunsetStr}, מנחה: ${minchaStr}`;
+            buildSlides();
+        }
+
+        function calculateSunset(date, lat, lon) {
+            try {
+                const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+                const declination = 23.45 * Math.sin(((360 * (284 + dayOfYear)) / 365) * (Math.PI / 180));
+                const hourAngle = Math.acos(-Math.tan(lat * (Math.PI / 180)) * Math.tan(declination * (Math.PI / 180)));
+                const sunsetHourUTC = 12 + (hourAngle * (180 / Math.PI) / 15) - (lon / 15);
+                const sunsetDate = new Date(date);
+                let totalHours = sunsetHourUTC + 3;
+                sunsetDate.setHours(Math.floor(totalHours), Math.floor((totalHours - Math.floor(totalHours)) * 60), 0);
+                return sunsetDate;
+            } catch (e) { return null; }
+        }
+
+        function saveSunsetConfig() {
+            sunsetConfig.minBefore = parseInt(document.getElementById('minBeforeSunsetInput').value) || 20;
+            localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
+            localStorage.removeItem('mp_weekly_sunset_data');
+            alert('הוגדר בהצלחה!');
+            checkAndApplyWeeklySunset();
+        }
+
+        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || {
+            title: 'בית המדרש "מבקשי פניך"',
+            subtitle: 'תורה • תפילה • גמילות חסדים',
+            align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4
+        };
+
+        let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 1.8, color: '#f9fafb', style: 'normal' };
+        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || {
+            weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש',
+            shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית'
+        };
+
+        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorner', 'donation', 'halacha', 'gallery'];
+
+        let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v3')) || [
+            { title: 'שחרית', time: '06:30', fontSize: 2, titleColor: '#d1d5db', timeColor: '#ffffff' },
+            { title: 'מנחה', time: '19:00', fontSize: 2, titleColor: '#d1d5db', timeColor: '#ffffff' },
+            { title: 'ערבית', time: '19:45', fontSize: 2, titleColor: '#d1d5db', timeColor: '#ffffff' }
+        ];
+        
+        let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {
+            parasha: 'פרשת השבוע',
+            fridayItems: [{ title: 'כניסת שבת', time: '18:45', fontSize: 2 }],
+            saturdayItems: [{ title: 'שחרית שבת', time: '08:30', fontSize: 2 }, { title: 'צאת השבת', time: '19:42', fontSize: 2 }]
+        };
+
+        let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3')) || [];
+        let customCorner = JSON.parse(localStorage.getItem('mp_custom_corner')) || { active: false, title: '', text: '', src: '' };
+        let gallery = JSON.parse(localStorage.getItem('mp_gallery_v2')) || [];
+        let donationImg = localStorage.getItem('mp_donation_img') || '';
+        let slideInterval = parseInt(localStorage.getItem('mp_interval')) || 8;
+
+        let currentSlideIndex = 0;
+        let slides = [];
+        let timer = null;
+        let progressTimer = null;
+        let isPaused = false;
+
+        const orderedDays = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
+        const sectionNames = {
+            shiurim: '📖 שיעורים מרכזיים', weekday: '🕐 זמני תפילות ימי חול',
+            shabbat: '🕯️ זמני שבת קודש', customCorner: '📌 פינה מותאמת אישית',
+            donation: '💳 תרומות לאחזקת בית המדרש', halacha: '📜 הלכה יומית', gallery: '🖼️ גלריית פעילויות'
+        };
+
+        window.onload = function() {
+            try {
+                document.getElementById('slideIntervalInput').value = slideInterval;
+                document.getElementById('minBeforeSunsetInput').value = sunsetConfig.minBefore;
+                applyHeaderStyles();
+                checkAndApplyWeeklySunset();
+                buildSlides();
+                startRotation();
+                renderAdminData();
+            } catch (e) {
+                buildSlides();
+                startRotation();
+            }
+        };
+
+        function applyHeaderStyles() {
+            const header = document.getElementById('mainHeader');
+            const h1 = document.getElementById('headerTitle');
+            const p = document.getElementById('headerSubtitle');
+            if(header) header.style.textAlign = headerConfig.align || 'center';
+            if(h1) {
+                h1.innerText = headerConfig.title || 'בית המדרש "מבקשי פניך"';
+                h1.style.fontSize = (headerConfig.fontSize || 1.6) + 'rem';
+            }
+            if(p) p.innerText = headerConfig.subtitle || '';
+        }
+
+        function createTimeBoxHtml(item) {
+            return `
+                <div class="time-box">
+                    <h3 style="color:${item.titleColor || '#d1d5db'};">${item.title}</h3>
+                    <div class="time-val" style="color:${item.timeColor || '#ffffff'};">${item.time}</div>
+                </div>
+            `;
+        }
+
+        function createCompactBoxHtml(item) {
+            return `
+                <div class="time-box-compact">
+                    <h3>${item.title}</h3>
+                    <div class="time-val">${item.time}</div>
+                </div>
+            `;
+        }
+
+        function buildSlides() {
+            const display = document.getElementById('mainDisplay');
+            if(!display) return;
+            display.innerHTML = '';
+            slides = [];
+
+            const slideTitleStyle = `text-align: ${headerConfig.slideAlign || 'center'}; font-size: ${headerConfig.slideFontSize || 1.4}rem;`;
+
+            sectionOrder.forEach(secKey => {
+                if (secKey === 'weekday') {
+                    const timesSlide = document.createElement('div');
+                    timesSlide.className = 'slide';
+                    timesSlide.innerHTML = `
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.weekday}</div>
+                        <div class="times-grid">${weekdayTimes.map(item => createTimeBoxHtml(item)).join('')}</div>
+                    `;
+                    display.appendChild(timesSlide);
+                    slides.push(timesSlide);
+                }
+
+                if (secKey === 'shabbat') {
+                    const shabbatSlide = document.createElement('div');
+                    shabbatSlide.className = 'slide';
+                    shabbatSlide.innerHTML = `
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${shabbatData.parasha}</div>
+                        <div class="shabbat-slide-content">
+                            <div class="shabbat-section-title">🕯️ יום שישי</div>
+                            <div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createCompactBoxHtml(i)).join('')}</div>
+                            <div class="shabbat-section-title">☀️ יום שבת</div>
+                            <div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createCompactBoxHtml(i)).join('')}</div>
+                        </div>
+                    `;
+                    display.appendChild(shabbatSlide);
+                    slides.push(shabbatSlide);
+                }
+
+                if (secKey === 'shiurim') {
+                    shiurimByDays.forEach(s => {
+                        const shiurSlide = document.createElement('div');
+                        shiurSlide.className = 'slide';
+                        shiurSlide.innerHTML = `
+                            <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shiurim}</div>
+                            <div class="shiur-info-bar"><div>📅 <span>${s.day}</span></div><div>🕒 <span>${s.time}</span></div><div>📍 <span>${s.location}</span></div></div>
+                            ${s.src ? `<img src="${s.src}" class="image-display">` : '<div style="color:var(--text-muted); margin-top:40px; font-size:1.5rem;">אין תמונה מוגדרת</div>'}
+                        `;
+                        display.appendChild(shiurSlide);
+                        slides.push(shiurSlide);
+                    });
+                }
+
+                if (secKey === 'customCorner' && customCorner.active) {
+                    const cornerSlide = document.createElement('div');
+                    cornerSlide.className = 'slide';
+                    cornerSlide.innerHTML = `
+                        <div class="slide-title" style="${slideTitleStyle}">${customCorner.title || 'פינה מותאמת אישית'}</div>
+                        ${customCorner.text ? `<div class="custom-box">${customCorner.text}</div>` : ''}
+                        ${customCorner.src ? `<img src="${customCorner.src}" class="image-display" style="margin-top:10px;">` : ''}
+                    `;
+                    display.appendChild(cornerSlide);
+                    slides.push(cornerSlide);
+                }
+
+                if (secKey === 'donation' && donationImg) {
+                    const donSlide = document.createElement('div');
+                    donSlide.className = 'slide';
+                    donSlide.innerHTML = `
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.donation}</div>
+                        <img src="${donationImg}" class="image-display">
+                    `;
+                    display.appendChild(donSlide);
+                    slides.push(donSlide);
+                }
+
+                if (secKey === 'halacha') {
+                    const halachaSlide = document.createElement('div');
+                    halachaSlide.className = 'slide';
+                    const hStyle = `font-size: ${halachaConfig.fontSize || 1.8}rem; color: ${halachaConfig.color || '#f9fafb'}; font-style: ${halachaConfig.style || 'normal'};`;
+                    halachaSlide.innerHTML = `
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.halacha}</div>
+                        <div class="halacha-box" style="${hStyle}">${getDailyHalacha()}</div>
+                    `;
+                    display.appendChild(halachaSlide);
+                    slides.push(halachaSlide);
+                }
+
+                if (secKey === 'gallery') {
+                    gallery.forEach(item => {
+                        const galSlide = document.createElement('div');
+                        galSlide.className = 'slide';
+                        galSlide.innerHTML = `
+                            <div class="slide-title" style="${slideTitleStyle}">${item.title || 'פעילויות בית המדרש'}</div>
+                            <img src="${item.src}" class="image-display">
+                        `;
+                        display.appendChild(galSlide);
+                        slides.push(galSlide);
+                    });
+                }
+            });
+
+            if (slides.length > 0) {
+                if (currentSlideIndex >= slides.length) currentSlideIndex = 0;
+                showSlide(currentSlideIndex);
+            }
+        }
+
+        function showSlide(index) {
+            slides.forEach((s, i) => s.classList.toggle('active', i === index));
+        }
+
+        function startRotation() {
+            clearInterval(timer);
+            clearInterval(progressTimer);
+            if (slides.length <= 1 || isPaused) {
+                const bar = document.getElementById('timeProgressBar');
+                if(bar) bar.style.width = '0%';
+                return;
+            }
+
+            let startTime = Date.now();
+            let durationMs = slideInterval * 1000;
+
+            progressTimer = setInterval(() => {
+                if (isPaused) return;
+                let elapsed = Date.now() - startTime;
+                let progress = (elapsed / durationMs) * 100;
+                if (progress > 100) progress = 100;
+                const bar = document.getElementById('timeProgressBar');
+                if(bar) bar.style.width = progress + '%';
+            }, 50);
+
+            timer = setInterval(() => { nextSlide(); }, durationMs);
+        }
+
+        function nextSlide() { 
+            if (slides.length === 0) return;
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length; 
+            showSlide(currentSlideIndex); 
+            startRotation(); 
+        }
+
+        function prevSlide() { 
+            if (slides.length === 0) return;
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length; 
+            showSlide(currentSlideIndex); 
+            startRotation(); 
+        }
+
+        function openAdminModal() { renderAdminData(); document.getElementById('adminModal').classList.add('open'); isPaused = true; }
+        function closeAdminModal() { document.getElementById('adminModal').classList.remove('open'); buildSlides(); isPaused = false; startRotation(); }
+        function saveInterval() { slideInterval = parseInt(document.getElementById('slideIntervalInput').value) || 8; localStorage.setItem('mp_interval', slideInterval); alert('עודכן!'); startRotation(); }
+
+        function saveHeaderStyles() {
+            headerConfig.title = document.getElementById('headerTitleInput').value;
+            headerConfig.subtitle = document.getElementById('headerSubtitleInput').value;
+            headerConfig.align = document.getElementById('headerAlignInput').value;
+            headerConfig.fontSize = parseFloat(document.getElementById('headerFontSizeInput').value) || 1.6;
+            localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
+            alert('נשמר!');
+            applyHeaderStyles();
+            buildSlides();
+        }
+
+        function saveHalachaData() {
+            halachaConfig.fontSize = parseFloat(document.getElementById('halachaFontSizeInput').value) || 1.8;
+            halachaConfig.color = document.getElementById('halachaTextColorInput').value || '#f9fafb';
+            halachaConfig.style = document.getElementById('halachaFontStyleInput').value || 'normal';
+            localStorage.setItem('mp_halacha', document.getElementById('halachaInput').value);
+            localStorage.setItem('mp_halacha_config', JSON.stringify(halachaConfig));
+            alert('נשמר!');
+            buildSlides();
+        }
+
+        function renderSectionOrderAdmin() {
+            const container = document.getElementById('sectionOrderContainer');
+            if(!container) return;
+            container.innerHTML = sectionOrder.map((key, idx) => `
+                <div class="order-admin-item">
+                    <strong>${sectionNames[key] || key}</strong>
+                    <button class="btn-action" onclick="moveSection(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>⬆️</button>
+                    <button class="btn-action" onclick="moveSection(${idx}, 1)" ${idx === sectionOrder.length - 1 ? 'disabled' : ''}>⬇️</button>
+                </div>
+            `).join('');
+        }
+
+        function moveSection(index, dir) {
+            const newIdx = index + dir;
+            if (newIdx >= 0 && newIdx < sectionOrder.length) {
+                const temp = sectionOrder[index];
+                sectionOrder[index] = sectionOrder[newIdx];
+                sectionOrder[newIdx] = temp;
+                renderSectionOrderAdmin();
+            }
+        }
+
+        function saveSectionOrder() {
+            localStorage.setItem('mp_section_order', JSON.stringify(sectionOrder));
+            alert('סדר השקופיות נשמר!');
+            buildSlides();
+        }
+
+        function renderWeekdayAdminItems() {
+            const container = document.getElementById('weekdayItemsContainer');
+            if(!container) return;
+            container.innerHTML = weekdayTimes.map((item, idx) => `
+                <div class="time-box-admin-card">
+                    <div class="time-box-admin-card-header"><strong>תיבה #${idx+1}</strong><button class="btn-action btn-danger" onclick="weekdayTimes.splice(${idx},1);renderWeekdayAdminItems();">מחק</button></div>
+                    <div class="grid-2col">
+                        <input type="text" value="${item.title}" onchange="weekdayTimes[${idx}].title=this.value">
+                        <input type="text" value="${item.time}" onchange="weekdayTimes[${idx}].time=this.value">
+                    </div>
+                </div>
+            `).join('');
+        }
+        function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00' }); renderWeekdayAdminItems(); }
+        function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v3', JSON.stringify(weekdayTimes)); alert('נשמר!'); buildSlides(); }
+
+        function renderShabbatAdminItems() {
+            const friElem = document.getElementById('fridayItemsContainer');
+            if(friElem) {
+                friElem.innerHTML = shabbatData.fridayItems.map((item, idx) => `
+                    <div class="time-box-admin-card">
+                        <div class="time-box-admin-card-header"><strong>שישי #${idx+1}</strong><button class="btn-action btn-danger" onclick="shabbatData.fridayItems.splice(${idx},1);renderShabbatAdminItems();">מחק</button></div>
+                        <div class="grid-2col"><input type="text" value="${item.title}" onchange="shabbatData.fridayItems[${idx}].title=this.value"><input type="text" value="${item.time}" onchange="shabbatData.fridayItems[${idx}].time=this.value"></div>
+                    </div>
+                `).join('');
+            }
+            const satElem = document.getElementById('saturdayItemsContainer');
+            if(satElem) {
+                satElem.innerHTML = shabbatData.saturdayItems.map((item, idx) => `
+                    <div class="time-box-admin-card">
+                        <div class="time-box-admin-card-header"><strong>שבת #${idx+1}</strong><button class="btn-action btn-danger" onclick="shabbatData.saturdayItems.splice(${idx},1);renderShabbatAdminItems();">מחק</button></div>
+                        <div class="grid-2col"><input type="text" value="${item.title}" onchange="shabbatData.saturdayItems[${idx}].title=this.value"><input type="text" value="${item.time}" onchange="shabbatData.saturdayItems[${idx}].time=this.value"></div>
+                    </div>
+                `).join('');
+            }
+        }
+        function addShabbatItem(day) { shabbatData[day === 'friday' ? 'fridayItems' : 'saturdayItems'].push({ title: 'חדש', time: '00:00' }); renderShabbatAdminItems(); }
+        function saveShabbatData() {
+            const parashaElem = document.getElementById('parashaInput');
+            if(parashaElem) shabbatData.parasha = parashaElem.value;
+            localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
+            alert('נשמר!');
+            buildSlides();
+        }
+
+        function renderShiurimAdminItems() {
+            const container = document.getElementById('shiurimAdminContainer');
+            if(!container) return;
+            container.innerHTML = shiurimByDays.map((s, idx) => `
+                <div class="shiur-admin-card">
+                    <div class="shiur-admin-card-header"><strong>שיעור #${idx+1}</strong><button class="btn-action btn-danger" onclick="shiurimByDays.splice(${idx},1);renderShiurimAdminItems();">מחק</button></div>
+                    <div class="grid-3col">
+                        <select onchange="shiurimByDays[${idx}].day=this.value">${orderedDays.map(d => `<option value="${d}" ${s.day===d?'selected':''}>${d}</option>`).join('')}</select>
+                        <input type="text" value="${s.time}" placeholder="שעה" onchange="shiurimByDays[${idx}].time=this.value">
+                        <input type="text" value="${s.location}" placeholder="מיקום" onchange="shiurimByDays[${idx}].location=this.value">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="file" accept="image/*" id="shiurFile_${idx}" style="display:none;" onchange="handleShiurImageUpload(this, ${idx})">
+                        <button class="btn-action btn-info" onclick="document.getElementById('shiurFile_${idx}').click()">📁 בחר תמונה לשיעור</button>
+                        <span style="font-size: 0.85rem; color: #34d399;">${s.src ? '✔️ תמונה קיימת' : 'טרם נבחרה תמונה'}</span>
+                    </div>
+                    ${s.src ? `<img src="${s.src}" style="max-height: 70px; border-radius: 6px; object-fit: contain; margin-top: 5px;">` : ''}
+                </div>
+            `).join('');
+        }
+
+        function handleShiurImageUpload(input, idx) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    shiurimByDays[idx].src = e.target.result;
+                    renderShiurimAdminItems();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function addNewShiurBox() { shiurimByDays.push({ day: 'יום ראשון', time: '', location: '', src: '' }); renderShiurimAdminItems(); }
+        function saveShiurimData() { localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays)); alert('נשמר!'); buildSlides(); }
+
+        function renderGalleryAdminItems() {
+            const container = document.getElementById('galleryAdminList');
+            if(!container) return;
+            if (gallery.length === 0) {
+                container.innerHTML = '<div style="color:#9ca3af; padding:10px;">אין תמונות בגלריה.</div>';
+                return;
+            }
+            container.innerHTML = gallery.map((g, idx) => `
+                <div class="gallery-admin-card">
+                    <div class="gallery-admin-card-header"><strong>תמונה #${idx+1}</strong><button class="btn-action btn-danger" onclick="gallery.splice(${idx},1);renderGalleryAdminItems();buildSlides();">מחק</button></div>
+                    <input type="text" value="${g.title || ''}" placeholder="כותרת תמונה" onchange="gallery[${idx}].title=this.value">
+                    <img src="${g.src}" style="max-height:80px; object-fit:contain;">
+                </div>
+            `).join('');
+        }
+        function triggerGalleryUpload() { document.getElementById('activityImgInput').click(); }
+        function handleGalleryImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    gallery.push({ id: Date.now(), title: 'פעילות', src: e.target.result });
+                    localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery));
+                    renderGalleryAdminItems();
+                    buildSlides();
+                    input.value = '';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        function saveGalleryData() { localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery)); alert('נשמר!'); buildSlides(); }
+
+        function saveCustomCorner() {
+            customCorner.active = document.getElementById('customCornerActive').checked;
+            customCorner.title = document.getElementById('customCornerTitle').value;
+            customCorner.text = document.getElementById('customCornerText').value;
+            const fileInput = document.getElementById('customCornerImgInput');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    customCorner.src = evt.target.result;
+                    localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner));
+                    alert('נשמר!');
+                    renderAdminData();
+                    buildSlides();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner));
+                alert('נשמר!');
+                buildSlides();
+            }
+        }
+
+        function saveDonationData() {
+            sectionTitles.donation = document.getElementById('donationTitleInput').value || sectionTitles.donation;
+            localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
+            alert('נשמר!');
+            buildSlides();
+        }
+
+        document.getElementById('donationImgInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    donationImg = evt.target.result;
+                    localStorage.setItem('mp_donation_img', donationImg);
+                    renderAdminData();
+                    buildSlides();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function renderAdminData() {
+            document.getElementById('headerTitleInput').value = headerConfig.title || '';
+            document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
+            document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
+            document.getElementById('headerFontSizeInput').value = headerConfig.fontSize || 1.6;
+
+            document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 1.8;
+            document.getElementById('halachaTextColorInput').value = halachaConfig.color || '#f9fafb';
+            document.getElementById('halachaFontStyleInput').value = halachaConfig.style || 'normal';
+            document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || '';
+
+            document.getElementById('parashaInput').value = shabbatData.parasha || '';
+            document.getElementById('donationTitleInput').value = sectionTitles.donation || '';
+
+            renderSectionOrderAdmin();
+            renderWeekdayAdminItems();
+            renderShabbatAdminItems();
+            renderShiurimAdminItems();
+            renderGalleryAdminItems();
+
+            document.getElementById('customCornerActive').checked = customCorner.active;
+            document.getElementById('customCornerTitle').value = customCorner.title || '';
+            document.getElementById('customCornerText').value = customCorner.text || '';
+            document.getElementById('customCornerPreview').innerHTML = customCorner.src ? `<img src="${customCorner.src}" style="max-height: 80px; border-radius: 6px;">` : '';
+            document.getElementById('donationPreview').innerHTML = donationImg ? `<img src="${donationImg}" style="max-height: 100px; border-radius: 6px;">` : 'טרם הועלתה תמונה';
+        }
+
+        function exportCompleteHtmlFile() {
+            let docClone = document.documentElement.cloneNode(true);
+            let modal = docClone.querySelector('#adminModal');
+            let passModal = docClone.querySelector('#passwordModal');
+            if (modal) modal.remove();
+            if (passModal) passModal.remove();
+
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha'];
+            let storageData = {};
+            keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
+
+            let scriptInjection = `<script>const savedData = ${JSON.stringify(storageData)}; for (let k in savedData) { localStorage.setItem(k, savedData[k]); }<\/script>`;
+            docClone.querySelector('body').insertAdjacentHTML('beforeend', scriptInjection);
+
+            const blob = new Blob(["<!DOCTYPE html>\n" + docClone.outerHTML], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; 
+            a.download = 'index.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+<script>const savedData = {}; for (let k in savedData) { localStorage.setItem(k, savedData[k]); }</script></body></html>
