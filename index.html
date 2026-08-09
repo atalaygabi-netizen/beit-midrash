@@ -401,7 +401,11 @@
             <div class="admin-section">
                 <h3>🕯️ זמני שבת קודש</h3>
                 <label>פרשת השבוע:</label>
-                <input type="text" id="parashaInput" placeholder="שם הפרשה">
+                <input type="text" id="parashaInput" placeholder="למשל: פרשת שופטים">
+                
+                <label>הפטרה (אופציונלי):</label>
+                <input type="text" id="haftarahInput" placeholder="למשל: הפטרה: שמעו דבר ה'">
+
                 <h4 style="color:#60a5fa; margin:10px 0 5px 0;">יום שישי</h4>
                 <div id="fridayItemsContainer"></div>
                 <button class="btn-action btn-success" onclick="addShabbatItem('friday')">+ הוסף ליום שישי</button>
@@ -485,7 +489,7 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "1234"; // סיסמת הניהול
+        const ADMIN_PASSWORD = "1234";
 
         const settingsBtn = document.getElementById('settingsBtn');
         function handleSettingsClick(e) {
@@ -526,7 +530,6 @@
             }
         }
 
-        // מנגנון מגע ומעבר בין שקופיות במובייל (גרירה או לחיצה בצדדים)
         let touchStartX = 0;
         let touchStartY = 0;
 
@@ -544,12 +547,9 @@
             let diffX = touchStartX - touchEndX;
             let diffY = Math.abs(touchStartY - touchEndY);
 
-            // זיהוי גרירה (Swipe)
             if (Math.abs(diffX) > 50 && diffY < 100) {
                 if (diffX > 0) { nextSlide(); } else { prevSlide(); }
-            } 
-            // זיהוי לחיצה רגילה (Tap) - חצי ימני או שמאלי של המסך
-            else if (Math.abs(diffX) < 10 && diffY < 10) {
+            } else if (Math.abs(diffX) < 10 && diffY < 10) {
                 let screenWidth = window.innerWidth;
                 if (touchEndX > screenWidth / 2) { nextSlide(); } else { prevSlide(); }
             }
@@ -593,7 +593,8 @@
         ];
         
         let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {
-            parasha: 'פרשת השבוע',
+            parasha: 'פרשת שופטים',
+            haftarah: '',
             fridayItems: [{ title: 'כניסת שבת', time: '18:45', fontSize: 2 }],
             saturdayItems: [{ title: 'שחרית שבת', time: '08:30', fontSize: 2 }, { title: 'צאת השבת', time: '19:42', fontSize: 2 }]
         };
@@ -675,7 +676,8 @@
                     const shabbatSlide = document.createElement('div');
                     shabbatSlide.className = 'slide';
                     shabbatSlide.innerHTML = `
-                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${shabbatData.parasha}</div>
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${shabbatData.parasha || 'פרשת השבוע'}</div>
+                        ${shabbatData.haftarah ? `<div style="color:#9ca3af; font-size:0.9rem; margin-bottom:6px;">${shabbatData.haftarah}</div>` : ''}
                         <div class="shabbat-container">
                             <div class="shabbat-section-title">🕯️ יום שישי</div><div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                             <div class="shabbat-section-title">☀️ יום שבת</div><div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
@@ -887,8 +889,8 @@
         }
         function addShabbatItem(day) { shabbatData[day === 'friday' ? 'fridayItems' : 'saturdayItems'].push({ title: 'חדש', time: '00:00' }); renderShabbatAdminItems(); }
         function saveShabbatData() {
-            const parashaElem = document.getElementById('parashaInput');
-            if(parashaElem) shabbatData.parasha = parashaElem.value;
+            shabbatData.parasha = document.getElementById('parashaInput').value;
+            shabbatData.haftarah = document.getElementById('haftarahInput').value;
             localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
             alert('נשמר!');
             buildSlides();
@@ -1015,6 +1017,7 @@
             document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || '';
 
             document.getElementById('parashaInput').value = shabbatData.parasha || '';
+            document.getElementById('haftarahInput').value = shabbatData.haftarah || '';
             document.getElementById('donationTitleInput').value = sectionTitles.donation || '';
 
             renderSectionOrderAdmin();
