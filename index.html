@@ -36,7 +36,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
             position: relative;
             z-index: 10;
-            text-align: center;
         }
 
         header h1 {
@@ -54,7 +53,6 @@
             font-size: 0.95rem;
         }
 
-        /* כפתור הגדרות קטן בפינה עם מרווח בטוח מלחיצות מערכת בנייד */
         .corner-settings-btn {
             position: fixed;
             top: 8px;
@@ -64,7 +62,7 @@
             background: rgba(245, 158, 11, 0.95);
             border-radius: 12px;
             cursor: pointer;
-            z-index: 999999;
+            z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -156,14 +154,14 @@
             padding: 5px;
         }
 
-        .shabbat-slide-content {
+        .shabbat-container {
             display: flex;
             flex-direction: column;
+            gap: 10px;
             width: 95%;
             max-width: 1400px;
-            gap: 6px;
             max-height: 78vh;
-            justify-content: center;
+            overflow-y: auto;
         }
 
         .shabbat-section-title {
@@ -178,21 +176,9 @@
         .shabbat-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 6px;
+            gap: 8px;
             width: 100%;
         }
-
-        .time-box-compact {
-            background: #030712;
-            padding: 8px 6px;
-            border-radius: 8px;
-            text-align: center;
-            border-right: 4px solid var(--accent);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-        }
-
-        .time-box-compact h3 { margin: 0 0 2px 0; font-size: 0.8rem; color: #d1d5db; }
-        .time-box-compact .time-val { font-weight: 900; font-size: 1.1rem; color: #ffffff; }
 
         .time-box {
             background: #030712;
@@ -356,11 +342,20 @@
 </head>
 <body>
 
-    <!-- כפתור הגדרות מעודכן עם מרווח בטוח מלחיצות מערכת -->
-    <div class="corner-settings-btn" id="settingsBtn" title="הגדרות מנהל">⚙️</div>
+    <div class="corner-settings-btn" id="settingsBtn" title="הגדרות">⚙️</div>
 
     <!-- חלון הזנת סיסמה -->
-    
+    <div class="password-modal" id="passwordModal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h2>כניסת מנהל</h2>
+            <p>הקלד סיסמת ניהול:</p>
+            <input type="password" id="adminPasswordInput" placeholder="סיסמה" style="text-align: center;" onkeydown="if(event.key === 'Enter') verifyPassword()">
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button class="btn-action btn-success" onclick="verifyPassword()">כניסה</button>
+                <button class="btn-action btn-danger" onclick="closePasswordModal()">ביטול</button>
+            </div>
+        </div>
+    </div>
 
     <header id="mainHeader" style="text-align: center;">
         <h1 id="headerTitle" style="font-size: 1.6rem;">בית המדרש "מבקשי פניך"</h1>
@@ -368,76 +363,149 @@
     </header>
 
     <div class="time-progress-container">
-        <div class="time-progress-bar" id="timeProgressBar" style="width: 20%;"></div>
+        <div class="time-progress-bar" id="timeProgressBar" style="width: 0%;"></div>
     </div>
 
-    <div class="main-display" id="mainDisplay"><div class="slide active">
-                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">זמני תפילות ימי חול</div>
-                        <div class="times-grid">
-                <div class="time-box">
-                    <h3 style="color:#d1d5db;">שחרית</h3>
-                    <div class="time-val" style="color:#ffffff;">06:30</div>
-                </div>
-            
-                <div class="time-box">
-                    <h3 style="color:#d1d5db;">מנחה</h3>
-                    <div class="time-val" style="color:#ffffff;">19:00</div>
-                </div>
-            
-                <div class="time-box">
-                    <h3 style="color:#d1d5db;">ערבית</h3>
-                    <div class="time-val" style="color:#ffffff;">19:45</div>
-                </div>
-            </div>
-                    </div><div class="slide">
-                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">זמני שבת קודש - פרשת השבוע</div>
-                        <div class="shabbat-slide-content">
-                            <div class="shabbat-section-title">🕯️ יום שישי</div>
-                            <div class="shabbat-grid">
-                <div class="time-box-compact">
-                    <h3>כניסת שבת</h3>
-                    <div class="time-val">18:45</div>
-                </div>
-            </div>
-                            <div class="shabbat-section-title">☀️ יום שבת</div>
-                            <div class="shabbat-grid">
-                <div class="time-box-compact">
-                    <h3>שחרית שבת</h3>
-                    <div class="time-val">08:30</div>
-                </div>
-            
-                <div class="time-box-compact">
-                    <h3>צאת השבת</h3>
-                    <div class="time-val">19:42</div>
-                </div>
-            </div>
-                        </div>
-                    </div><div class="slide">
-                        <div class="slide-title" style="text-align: center; font-size: 1.4rem;">הלכה יומית</div>
-                        <div class="halacha-box" style="font-size: 1.8rem; color: #f9fafb; font-style: normal;">אמר רבי אלעזר אמר רבי חנינא, תלמידי חכמים מרבים שלום בעולם, שנאמר וכל בניך לימודי ה' ורב שלום בניך.</div>
-                    </div></div>
+    <div class="main-display" id="mainDisplay"></div>
 
-    
+    <!-- לוח בקרה מנהל -->
+    <div class="admin-modal" id="adminModal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">לוח בקרה וניהול מערכת</h2>
+                <button class="btn-action btn-danger" onclick="closeAdminModal()">סגור ✕</button>
+            </div>
+
+            <!-- ייצוא ושמירה -->
+            <div class="admin-section" style="background: #1e293b; border: 2px solid #10b981;">
+                <h3 style="color: #34d399; margin-top:0;">🚀 גיבוי מערכת</h3>
+                <button class="btn-action btn-success" onclick="exportCompleteHtmlFile()">📥 הורד קובץ HTML מעודכן למחשב</button>
+            </div>
+
+            <!-- סדר השקופיות -->
+            <div class="admin-section">
+                <h3>🔄 סדר הופעת השקופיות</h3>
+                <div id="sectionOrderContainer"></div>
+                <button class="btn-action btn-success" onclick="saveSectionOrder()">שמור סדר שקופיות</button>
+            </div>
+
+            <!-- זמני חול -->
+            <div class="admin-section">
+                <h3>🕐 זמני תפילות ימי חול</h3>
+                <div id="weekdayItemsContainer"></div>
+                <button class="btn-action btn-success" onclick="addWeekdayItem()">+ הוסף תיבה</button>
+                <button class="btn-action" onclick="saveWeekdayTimes()">שמור זמני חול</button>
+            </div>
+
+            <!-- זמני שבת -->
+            <div class="admin-section">
+                <h3>🕯️ זמני שבת קודש</h3>
+                <label>פרשת השבוע:</label>
+                <input type="text" id="parashaInput" placeholder="שם הפרשה">
+                <h4 style="color:#60a5fa; margin:10px 0 5px 0;">יום שישי</h4>
+                <div id="fridayItemsContainer"></div>
+                <button class="btn-action btn-success" onclick="addShabbatItem('friday')">+ הוסף ליום שישי</button>
+                <h4 style="color:#60a5fa; margin:15px 0 5px 0;">יום שבת</h4>
+                <div id="saturdayItemsContainer"></div>
+                <button class="btn-action btn-success" onclick="addShabbatItem('saturday')">+ הוסף ליום שבת</button>
+                <br><br>
+                <button class="btn-action" onclick="saveShabbatData()">שמור זמני שבת</button>
+            </div>
+
+            <!-- שיעורים -->
+            <div class="admin-section">
+                <h3>📖 שיעורים מרכזיים</h3>
+                <div id="shiurimAdminContainer"></div>
+                <button class="btn-action btn-success" onclick="addNewShiurBox()">+ הוסף שיעור</button>
+                <button class="btn-action" onclick="saveShiurimData()">שמור שיעורים</button>
+            </div>
+
+            <!-- תרומות -->
+            <div class="admin-section">
+                <h3>💳 תרומות לאחזקת בית המדרש</h3>
+                <label>כותרת הפינה:</label>
+                <input type="text" id="donationTitleInput">
+                <label>תמונת ברקוד / קובץ תרומה:</label>
+                <input type="file" id="donationImgInput" accept="image/*">
+                <div id="donationPreview" style="margin-top: 10px;"></div>
+                <button class="btn-action" onclick="saveDonationData()">שמור תרומות</button>
+            </div>
+
+            <!-- גלריית פעילויות -->
+            <div class="admin-section">
+                <h3>🖼️ פעילות בית המדרש / גלריה</h3>
+                <input type="file" id="activityImgInput" accept="image/*" style="display:none;" onchange="handleGalleryImageUpload(this)">
+                <button class="btn-action btn-info" onclick="triggerGalleryUpload()">📁 הוסף תמונה לגלריה</button>
+                <div id="galleryAdminList" style="margin-top: 15px;"></div>
+                <button class="btn-action" onclick="saveGalleryData()" style="margin-top:10px;">שמור גלריה</button>
+            </div>
+
+            <!-- פינה מותאמת אישית -->
+            <div class="admin-section">
+                <h3>📌 פינה מותאמת אישית</h3>
+                <label><input type="checkbox" id="customCornerActive"> הפעל פינה זו</label>
+                <label>כותרת:</label>
+                <input type="text" id="customCornerTitle">
+                <label>טקסט חופשי:</label>
+                <textarea id="customCornerText"></textarea>
+                <label>תמונה (אופציונלי):</label>
+                <input type="file" id="customCornerImgInput" accept="image/*">
+                <div id="customCornerPreview" style="margin-top: 10px;"></div>
+                <button class="btn-action" onclick="saveCustomCorner()">שמור פינה אישית</button>
+            </div>
+
+            <!-- הלכה יומית -->
+            <div class="admin-section">
+                <h3>📜 הלכה יומית</h3>
+                <textarea id="halachaInput" placeholder="הכנס הלכה..."></textarea>
+                <div class="grid-3col" style="margin-top: 10px;">
+                    <div><label>גודל גופן (rem):</label><input type="number" id="halachaFontSizeInput" step="0.1" value="2.3"></div>
+                    <div><label>צבע טקסט:</label><input type="color" id="halachaTextColorInput" value="#f9fafb"></div>
+                    <div><label>סגנון:</label><select id="halachaFontStyleInput"><option value="normal">רגיל</option><option value="italic">נטוי</option></select></div>
+                </div>
+                <button class="btn-action" onclick="saveHalachaData()" style="margin-top:10px;">שמור הלכה</button>
+            </div>
+
+            <!-- הגדרות כלליות ותזמון -->
+            <div class="admin-section">
+                <h3>⚙️ הגדרות תצוגה וכותרת</h3>
+                <label>כותרת ראשית:</label><input type="text" id="headerTitleInput">
+                <label>כותרת משנה:</label><input type="text" id="headerSubtitleInput">
+                <div class="grid-2col">
+                    <div><label>יישור כותרת:</label><select id="headerAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
+                    <div><label>גודל כותרת (rem):</label><input type="number" id="headerFontSizeInput" step="0.1" value="1.6"></div>
+                </div>
+                <button class="btn-action" onclick="saveHeaderStyles()" style="margin-top:10px;">שמור כותרת</button>
+                <hr style="border-color:#374151; margin: 15px 0;">
+                <label for="slideIntervalInput">זמן הצגת שקופית (בשניות):</label>
+                <input type="number" id="slideIntervalInput" min="2" max="120" value="8">
+                <button class="btn-action" onclick="saveInterval()">עדכן זמן תחלופה</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const ADMIN_PASSWORD = "1234"; // סיסמת הניהול
 
-        // טיפול ממוקד בלחיצה ובמגע עם עצירת זליגת אירועים למערכת ההחלקה
-        const btn = document.getElementById('settingsBtn');
-        
+        const settingsBtn = document.getElementById('settingsBtn');
         function handleSettingsClick(e) {
             e.stopPropagation();
             e.preventDefault();
-            openPasswordModal();
+            requestPassword();
         }
+        settingsBtn.addEventListener('click', handleSettingsClick);
+        settingsBtn.addEventListener('touchend', handleSettingsClick);
 
-        btn.addEventListener('click', handleSettingsClick);
-        btn.addEventListener('touchend', handleSettingsClick);
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight') { nextSlide(); }
+            else if (e.key === 'ArrowLeft') { prevSlide(); }
+            else if (e.key === 'F2') { requestPassword(); }
+        });
 
-        function openPasswordModal() {
+        function requestPassword() {
+            isPaused = true;
             document.getElementById('adminPasswordInput').value = '';
             document.getElementById('passwordModal').classList.add('open');
-            isPaused = true;
             setTimeout(() => { document.getElementById('adminPasswordInput').focus(); }, 100);
         }
 
@@ -446,22 +514,19 @@
             isPaused = false;
         }
 
-        function verifyAdminPassword() {
-            let pass = document.getElementById('adminPasswordInput').value;
-            if (pass === ADMIN_PASSWORD) {
+        function verifyPassword() {
+            const enteredPass = document.getElementById('adminPasswordInput').value;
+            if (enteredPass === ADMIN_PASSWORD) {
                 closePasswordModal();
                 openAdminModal();
             } else {
-                alert("סיסמה שגויה!");
+                alert('סיסמה שגויה!');
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminPasswordInput').focus();
             }
         }
 
-        window.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight') { nextSlide(); }
-            else if (e.key === 'ArrowLeft') { prevSlide(); }
-            else if (e.key === 'F2') { openPasswordModal(); }
-        });
-
+        // מנגנון מגע ומעבר בין שקופיות במובייל (גרירה או לחיצה בצדדים)
         let touchStartX = 0;
         let touchStartY = 0;
 
@@ -479,9 +544,12 @@
             let diffX = touchStartX - touchEndX;
             let diffY = Math.abs(touchStartY - touchEndY);
 
+            // זיהוי גרירה (Swipe)
             if (Math.abs(diffX) > 50 && diffY < 100) {
                 if (diffX > 0) { nextSlide(); } else { prevSlide(); }
-            } else if (Math.abs(diffX) < 10 && diffY < 10) {
+            } 
+            // זיהוי לחיצה רגילה (Tap) - חצי ימני או שמאלי של המסך
+            else if (Math.abs(diffX) < 10 && diffY < 10) {
                 let screenWidth = window.innerWidth;
                 if (touchEndX > screenWidth / 2) { nextSlide(); } else { prevSlide(); }
             }
@@ -504,91 +572,13 @@
             return autoHalachot[dayOfYear % autoHalachot.length];
         }
 
-        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || { minBefore: 20 };
-
-        function checkAndApplyWeeklySunset() {
-            try {
-                const now = new Date();
-                const currentWeekNumber = getWeekNumber(now);
-                const savedWeekData = JSON.parse(localStorage.getItem('mp_weekly_sunset_data')) || {};
-
-                if (savedWeekData.weekNum === currentWeekNumber && savedWeekData.time) {
-                    applyCalculatedMinchaTime(savedWeekData.time, savedWeekData.sunset);
-                    return;
-                }
-
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(position => {
-                        try {
-                            const lat = position.coords.latitude;
-                            const lon = position.coords.longitude;
-                            const sunsetDate = calculateSunset(now, lat, lon);
-                            if (sunsetDate) {
-                                let hours = sunsetDate.getHours();
-                                let minutes = sunsetDate.getMinutes();
-                                let totalMin = (hours * 60) + minutes - sunsetConfig.minBefore;
-                                let mHours = Math.floor(totalMin / 60);
-                                let mMinutes = totalMin % 60;
-                                let sunsetStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                                let minTimeStr = `${String(mHours).padStart(2, '0')}:${String(mMinutes).padStart(2, '0')}`;
-
-                                localStorage.setItem('mp_weekly_sunset_data', JSON.stringify({
-                                    weekNum: currentWeekNumber,
-                                    time: minTimeStr,
-                                    sunset: sunsetStr
-                                }));
-                                applyCalculatedMinchaTime(minTimeStr, sunsetStr);
-                            }
-                        } catch (err) {}
-                    }, () => {}, { timeout: 3000 });
-                }
-            } catch (e) {}
-        }
-
-        function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-            return `${d.getUTCFullYear()}-W${Math.ceil((((d - yearStart) / 86400000) + 1)/7)}`;
-        }
-
-        function applyCalculatedMinchaTime(minchaStr, sunsetStr) {
-            weekdayTimes.forEach(item => {
-                if (item.title.includes('מנחה')) item.time = minchaStr;
-            });
-            const statusElem = document.getElementById('sunsetStatusText');
-            if(statusElem) statusElem.value = `שקיעה: ${sunsetStr}, מנחה: ${minchaStr}`;
-            buildSlides();
-        }
-
-        function calculateSunset(date, lat, lon) {
-            try {
-                const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-                const declination = 23.45 * Math.sin(((360 * (284 + dayOfYear)) / 365) * (Math.PI / 180));
-                const hourAngle = Math.acos(-Math.tan(lat * (Math.PI / 180)) * Math.tan(declination * (Math.PI / 180)));
-                const sunsetHourUTC = 12 + (hourAngle * (180 / Math.PI) / 15) - (lon / 15);
-                const sunsetDate = new Date(date);
-                let totalHours = sunsetHourUTC + 3;
-                sunsetDate.setHours(Math.floor(totalHours), Math.floor((totalHours - Math.floor(totalHours)) * 60), 0);
-                return sunsetDate;
-            } catch (e) { return null; }
-        }
-
-        function saveSunsetConfig() {
-            sunsetConfig.minBefore = parseInt(document.getElementById('minBeforeSunsetInput').value) || 20;
-            localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
-            localStorage.removeItem('mp_weekly_sunset_data');
-            alert('הוגדר בהצלחה!');
-            checkAndApplyWeeklySunset();
-        }
-
         let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || {
             title: 'בית המדרש "מבקשי פניך"',
             subtitle: 'תורה • תפילה • גמילות חסדים',
             align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4
         };
 
-        let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 1.8, color: '#f9fafb', style: 'normal' };
+        let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
         let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || {
             weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש',
             shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית'
@@ -630,9 +620,7 @@
         window.onload = function() {
             try {
                 document.getElementById('slideIntervalInput').value = slideInterval;
-                document.getElementById('minBeforeSunsetInput').value = sunsetConfig.minBefore;
                 applyHeaderStyles();
-                checkAndApplyWeeklySunset();
                 buildSlides();
                 startRotation();
                 renderAdminData();
@@ -657,17 +645,8 @@
         function createTimeBoxHtml(item) {
             return `
                 <div class="time-box">
-                    <h3 style="color:${item.titleColor || '#d1d5db'};">${item.title}</h3>
-                    <div class="time-val" style="color:${item.timeColor || '#ffffff'};">${item.time}</div>
-                </div>
-            `;
-        }
-
-        function createCompactBoxHtml(item) {
-            return `
-                <div class="time-box-compact">
-                    <h3>${item.title}</h3>
-                    <div class="time-val">${item.time}</div>
+                    <h3 style="color:${item.titleColor || '#d1d5db'}; font-size: calc(${item.fontSize || 2}rem * 0.6);">${item.title}</h3>
+                    <div class="time-val" style="color:${item.timeColor || '#ffffff'}; font-size: ${item.fontSize || 2}rem;">${item.time}</div>
                 </div>
             `;
         }
@@ -697,11 +676,9 @@
                     shabbatSlide.className = 'slide';
                     shabbatSlide.innerHTML = `
                         <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${shabbatData.parasha}</div>
-                        <div class="shabbat-slide-content">
-                            <div class="shabbat-section-title">🕯️ יום שישי</div>
-                            <div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createCompactBoxHtml(i)).join('')}</div>
-                            <div class="shabbat-section-title">☀️ יום שבת</div>
-                            <div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createCompactBoxHtml(i)).join('')}</div>
+                        <div class="shabbat-container">
+                            <div class="shabbat-section-title">🕯️ יום שישי</div><div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
+                            <div class="shabbat-section-title">☀️ יום שבת</div><div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                         </div>
                     `;
                     display.appendChild(shabbatSlide);
@@ -748,7 +725,7 @@
                 if (secKey === 'halacha') {
                     const halachaSlide = document.createElement('div');
                     halachaSlide.className = 'slide';
-                    const hStyle = `font-size: ${halachaConfig.fontSize || 1.8}rem; color: ${halachaConfig.color || '#f9fafb'}; font-style: ${halachaConfig.style || 'normal'};`;
+                    const hStyle = `font-size: ${halachaConfig.fontSize || 2.3}rem; color: ${halachaConfig.color || '#f9fafb'}; font-style: ${halachaConfig.style || 'normal'};`;
                     halachaSlide.innerHTML = `
                         <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.halacha}</div>
                         <div class="halacha-box" style="${hStyle}">${getDailyHalacha()}</div>
@@ -835,7 +812,7 @@
         }
 
         function saveHalachaData() {
-            halachaConfig.fontSize = parseFloat(document.getElementById('halachaFontSizeInput').value) || 1.8;
+            halachaConfig.fontSize = parseFloat(document.getElementById('halachaFontSizeInput').value) || 2.3;
             halachaConfig.color = document.getElementById('halachaTextColorInput').value || '#f9fafb';
             halachaConfig.style = document.getElementById('halachaFontStyleInput').value || 'normal';
             localStorage.setItem('mp_halacha', document.getElementById('halachaInput').value);
@@ -1032,7 +1009,7 @@
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
             document.getElementById('headerFontSizeInput').value = headerConfig.fontSize || 1.6;
 
-            document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 1.8;
+            document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 2.3;
             document.getElementById('halachaTextColorInput').value = halachaConfig.color || '#f9fafb';
             document.getElementById('halachaFontStyleInput').value = halachaConfig.style || 'normal';
             document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || '';
@@ -1056,8 +1033,8 @@
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
             let modal = docClone.querySelector('#adminModal');
-            let passModal = docClone.querySelector('#passwordModal');
             if (modal) modal.remove();
+            let passModal = docClone.querySelector('#passwordModal');
             if (passModal) passModal.remove();
 
             let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha'];
@@ -1070,11 +1047,9 @@
             const blob = new Blob(["<!DOCTYPE html>\n" + docClone.outerHTML], { type: 'text/html;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; 
-            a.download = 'index.html';
-            a.click();
+            a.href = url; a.download = 'beit_midrash_final.html'; a.click();
             URL.revokeObjectURL(url);
         }
     </script>
-
-<script>const savedData = {}; for (let k in savedData) { localStorage.setItem(k, savedData[k]); }</script></body></html>
+</body>
+</html>
