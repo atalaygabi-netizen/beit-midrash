@@ -69,7 +69,7 @@
         .time-progress-container { width: 100%; height: 5px; background: #1f2937; position: relative; z-index: 15; }
         .time-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.05s linear; box-shadow: 0 0 8px var(--accent); }
 
-        .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; }
+        .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; cursor: pointer; }
 
         .nav-btn { display: none !important; }
 
@@ -167,9 +167,8 @@
                 <button class="btn-action btn-danger" onclick="closeAdminModal()">סגור ✕</button>
             </div>
 
-            <!-- אזור חדש לגיבוי ושחזור מתוך לוח הבקרה -->
             <div class="admin-section" style="background: #1e1b4b; border: 2px solid #6366f1;">
-                <h3 style="color: #818cf8; margin-top:0;">💾 גיבוי ושחזור נתוני המערכת (קוֹד והגדרות)</h3>
+                <h3 style="color: #818cf8; margin-top:0;">💾 גיבוי ושחזור נתוני המערכת</h3>
                 <label>נתוני הקוד וההגדרות הנוכחיים:</label>
                 <textarea id="systemBackupInput" style="height: 90px; font-family: monospace; font-size: 0.85rem;" placeholder="לחץ על 'צור גיבוי' כדי לראות את כל נתוני המערכת כאן..."></textarea>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -261,8 +260,8 @@
             </div>
 
             <div class="admin-section">
-                <h3>📌 פינות מותאמות אישית נוספות (חדש!)</h3>
-                <p style="color: #9ca3af; font-size: 0.9rem; margin-top: 0;">כאן תוכל להוסיף כמה פינות או מודעות שתרצה, לכתוב טקסט ולהוסיף תמונה:</p>
+                <h3>📌 פינות מותאמות אישית נוספות</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem; margin-top: 0;">כאן תוכל להוסיף פינות או מודעות נוספות:</p>
                 <div id="customCornersContainer"></div>
                 <button class="btn-action btn-success" onclick="addCustomCornerBox()" style="margin-top: 10px;">+ הוסף פינה חדשה</button>
                 <br><br>
@@ -420,6 +419,7 @@
                 buildSlides();
                 startRotation();
                 initTouchSwipeEvents();
+                initDisplayClickHandler();
 
                 const donElem = document.getElementById('donationImgInput');
                 if (donElem) {
@@ -438,6 +438,25 @@
                 }
             } catch (e) { buildSlides(); startRotation(); }
         };
+
+        // הוספת מעבר שקופיות בלחיצה על צידי המסך (לנוחות בטלוויזיה / עכבר)
+        function initDisplayClickHandler() {
+            const mainDisplay = document.getElementById('mainDisplay');
+            if (!mainDisplay) return;
+            mainDisplay.addEventListener('click', function(e) {
+                // מניעת הפעלה אם לחצו בתוך מודال או משהו פנימי
+                if (e.target.closest('.admin-modal') || e.target.closest('.password-modal')) return;
+                const rect = this.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const width = rect.width;
+                // צד ימין או שמאל במסך (מותאם ל-RTL)
+                if (clickX < width / 2) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            });
+        }
 
         function initTouchSwipeEvents() {
             let touchStartX = 0;
@@ -903,7 +922,6 @@
             syncAllDataToCloud(); alert('נשמר!'); buildSlides();
         }
 
-        // פונקציות הגיבוי והשחזור החדשות שנוספו
         function generateSystemBackup() {
             let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
@@ -958,7 +976,6 @@
 
             document.getElementById('donationPreview').innerHTML = donationImg ? `<img src="${donationImg}" style="max-height: 100px; border-radius: 6px;">` : 'טרם הועלתה תמונה';
             
-            // יצירת גיבוי אוטומטי לתיבה בעת פתיחת לוח הבקרה
             generateSystemBackup();
         }
 
