@@ -69,7 +69,7 @@
 
         .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; touch-action: pan-y; }
 
-        /* החצים הוסתרו לחלוטין לבקשתך */
+        /* החצים מוסתרים לחלוטין */
         .nav-btn { display: none !important; }
 
         .slide {
@@ -429,26 +429,53 @@
             } catch (e) { buildSlides(); startRotation(); }
         };
 
+        /* מנגנון מגע משופר למובייל (החלקה וגם עצירה בלחיצה) */
         function initTouchSwipeEvents() {
             let touchStartX = 0;
             let touchEndX = 0;
+            let touchStartY = 0;
+            let touchEndY = 0;
             const mainDisplay = document.getElementById('mainDisplay');
             if(!mainDisplay) return;
 
-            mainDisplay.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            mainDisplay.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
             mainDisplay.addEventListener('touchend', function(e) {
                 touchEndX = e.changedTouches[0].screenX;
-                const threshold = 40;
-                if (touchEndX < touchStartX - threshold) { nextSlide(); }
-                else if (touchEndX > touchStartX + threshold) { prevSlide(); }
+                touchEndY = e.changedTouches[0].screenY;
+                
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+                
+                // אם זו החלקה אופקית (Swipe)
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    const threshold = 40;
+                    if (diffX < -threshold) { nextSlide(); }
+                    else if (diffX > threshold) { prevSlide(); }
+                } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+                    // לחיצה קצרה (Tap) - עוצרת או משחררת את התחלופה לקריאה נוחה
+                    isPaused = !isPaused;
+                    startRotation();
+                }
             }, { passive: true });
         }
 
         function initFirebaseConnection() {
-            // טיפ: אם תרצה שהטלפון והמחשב יתחברו אוטומטית בלי להקליד כל פעם, 
-            // תוכל להדביק את ה-JSON כאן במקום ה-localStorage אם תרצה, 
-            // או פשוט להגדיר פעם אחת בטלפון ובמחשב דרך לוח הבקרה.
-            const rawConfig = localStorage.getItem('mp_firebase_config');
+            // טיפ: ניתן להכניס כאן את הגדרות ה-Firebase שלך ישירות כדי שכל מכשיר יתחבר אוטומטית מיד!
+            const embeddedConfig = {
+                apiKey: "",
+                authDomain: "",
+                databaseURL: "",
+                projectId: "",
+                storageBucket: "",
+                messagingSenderId: "",
+                appId: ""
+            };
+
+            const rawConfig = localStorage.getItem('mp_firebase_config') || (embeddedConfig.databaseURL ? JSON.stringify(embeddedConfig) : null);
             if (!rawConfig) return;
             try {
                 const config = JSON.parse(rawConfig);
