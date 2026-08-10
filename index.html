@@ -37,327 +37,82 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
             position: relative;
             z-index: 10;
+            text-align: center;
         }
 
-        header h1 {
-            margin: 0;
-            color: #ffffff;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        header p {
-            margin: 1px 0 0 0;
-            color: var(--accent);
-            font-weight: bold;
-        }
+        header h1 { margin: 0; color: #ffffff; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        header p { margin: 1px 0 0 0; color: var(--accent); font-weight: bold; }
 
         .corner-settings-btn {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 45px;
-            height: 45px;
-            background: rgba(245, 158, 11, 0.8);
-            border-bottom-right-radius: 16px;
-            cursor: pointer;
-            z-index: 99999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            position: fixed; top: 0; left: 0; width: 45px; height: 45px;
+            background: rgba(245, 158, 11, 0.8); border-bottom-right-radius: 16px;
+            cursor: pointer; z-index: 99999; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
             transition: background 0.3s;
         }
-
         .corner-settings-btn:hover { background: var(--accent); }
 
-        .time-progress-container {
-            width: 100%;
-            height: 5px;
-            background: #1f2937;
-            position: relative;
-            z-index: 15;
-        }
+        .time-progress-container { width: 100%; height: 5px; background: #1f2937; position: relative; z-index: 15; }
+        .time-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.05s linear; box-shadow: 0 0 8px var(--accent); }
 
-        .time-progress-bar {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.05s linear;
-            box-shadow: 0 0 8px var(--accent);
-        }
-
-        .main-display {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px;
-            overflow: hidden;
-        }
+        .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; }
 
         .slide {
-            position: absolute;
-            top: 8px; bottom: 8px; left: 8px; right: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.8s ease-in-out, visibility 0.8s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-            border: 1px solid #1f2937;
+            position: absolute; top: 8px; bottom: 8px; left: 8px; right: 8px;
+            opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--card-bg); border-radius: 16px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border: 1px solid #1f2937;
         }
 
         .slide.active { opacity: 1; visibility: visible; }
+        .slide-title { font-weight: bold; color: var(--accent); margin-bottom: 8px; border-bottom: 2px solid var(--accent); padding-bottom: 4px; width: 100%; text-align: center; }
 
-        .slide-title {
-            font-weight: bold;
-            color: var(--accent);
-            margin-bottom: 8px;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 4px;
-            width: 100%;
+        .rosh-chodesh-card {
+            background: linear-gradient(145deg, #0f172a, #1e3a8a); border: 3px solid #38bdf8;
+            padding: 40px; border-radius: 24px; text-align: center; box-shadow: 0 12px 30px rgba(2, 132, 199, 0.4);
+            width: 90%; max-width: 1200px;
         }
+        .rosh-chodesh-card h2 { color: #f59e0b; font-size: 3rem; margin: 0 0 15px 0; }
+        .rosh-chodesh-card p { color: #ffffff; font-size: 2.2rem; margin: 0; font-weight: bold; }
 
-        .rosh-chodesh-banner {
-            background: linear-gradient(90deg, #1e3a8a, #0284c7);
-            color: #ffffff;
-            width: 95%;
-            max-width: 1400px;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            border: 1px solid #38bdf8;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .haftarah-info-bar {
-            background: #0f172a;
-            color: #38bdf8;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            margin-top: 10px;
-            text-align: center;
-            border: 1px solid #1e3a8a;
-            width: 100%;
+        /* עיצוב הפטרה בחלק העליון */
+        .haftarah-info-bar-top {
+            background: linear-gradient(90deg, #0f172a, #1e3a8a, #0f172a);
+            color: #38bdf8; padding: 12px 20px; border-radius: 12px; font-size: 1.6rem; font-weight: 900;
+            margin-bottom: 12px; text-align: center; border: 2px solid #38bdf8; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         .shiur-info-bar {
-            background: #1e293b;
-            width: 100%;
-            padding: 8px 15px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #f59e0b;
-            border: 1px solid #374151;
+            background: #1e293b; width: 100%; padding: 8px 15px; border-radius: 8px; display: flex;
+            justify-content: space-around; align-items: center; margin-bottom: 10px; font-size: 1.2rem; font-weight: bold; color: #f59e0b; border: 1px solid #374151;
         }
-
         .shiur-info-bar span { color: #ffffff; }
 
-        .times-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            width: 95%;
-            max-width: 1400px;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .shabbat-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 95%;
-            max-width: 1450px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .shabbat-section-title {
-            font-size: 1.3rem;
-            color: #60a5fa;
-            border-bottom: 1px solid #374151;
-            padding-bottom: 4px;
-            margin: 5px 0;
-        }
-
-        .shabbat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            width: 100%;
-        }
+        .times-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 95%; max-width: 1400px; max-height: 80vh; overflow-y: auto; padding: 10px; }
+        .shabbat-container { display: flex; flex-direction: column; gap: 12px; width: 95%; max-width: 1450px; max-height: 80vh; overflow-y: auto; }
+        .shabbat-section-title { font-size: 1.3rem; color: #60a5fa; border-bottom: 1px solid #374151; padding-bottom: 4px; margin: 5px 0; }
+        .shabbat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; width: 100%; }
 
         .time-box {
-            background: #030712;
-            padding: 15px 10px;
-            border-radius: 14px;
-            text-align: center;
-            border-right: 6px solid var(--accent);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: #030712; padding: 15px 10px; border-radius: 14px; text-align: center;
+            border-right: 6px solid var(--accent); box-shadow: 0 6px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center;
         }
 
-        .time-box h3 { margin: 0 0 6px 0; }
-        .time-box .time-val { font-weight: 900; }
+        .halacha-box { background: #030712; padding: 40px; border-radius: 20px; border-right: 8px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; line-height: 1.7; text-align: justify; }
+        .custom-box { background: #030712; padding: 30px; border-radius: 20px; border-right: 8px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; font-size: 2rem; line-height: 1.6; color: #f9fafb; text-align: center; }
+        .image-display { width: 100%; height: calc(100% - 35px); object-fit: contain; border-radius: 12px; }
 
-        .halacha-box {
-            background: #030712;
-            padding: 40px;
-            border-radius: 20px;
-            border-right: 8px solid var(--accent);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 1400px;
-            line-height: 1.7;
-            text-align: justify;
-        }
-
-        .custom-box {
-            background: #030712;
-            padding: 30px;
-            border-radius: 20px;
-            border-right: 8px solid var(--accent);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 1400px;
-            font-size: 2rem;
-            line-height: 1.6;
-            color: #f9fafb;
-            text-align: center;
-        }
-
-        .image-display {
-            width: 100%;
-            height: calc(100% - 35px);
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        .admin-modal, .password-modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
+        .admin-modal, .password-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .admin-modal.open, .password-modal.open { display: flex; }
-
-        .modal-content {
-            background: #111827;
-            color: #f9fafb;
-            width: 100%;
-            max-width: 950px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: 16px;
-            padding: 30px;
-            border: 1px solid #374151;
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--accent);
-            border-bottom: 2px solid #374151;
-            padding-bottom: 10px;
-            font-size: 1.8rem;
-        }
-
-        .admin-section {
-            background: #030712;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #1f2937;
-        }
-
-        .admin-section h3 { margin-top: 0; color: #60a5fa; font-size: 1.3rem; }
-
+        .modal-content { background: #111827; color: #f9fafb; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 30px; border: 1px solid #374151; }
+        .admin-section { background: #030712; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #1f2937; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
-
-        input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #374151;
-            background: #111827;
-            color: white;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-
-        input[type="color"] { height: 42px; padding: 2px; cursor: pointer; }
-        textarea { resize: vertical; min-height: 100px; font-family: inherit; }
-
-        .btn-action {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        .btn-danger { background: #dc2626; }
-        .btn-success { background: #10b981; }
-        .btn-info { background: #0284c7; }
-        .btn-warning { background: #d97706; }
-
-        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card {
-            background: #111827;
-            border: 1px solid #374151;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .order-admin-item {
-            display: grid;
-            grid-template-columns: 3fr auto auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-            background: #111827;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
+        input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        .btn-danger { background: #dc2626; } .btn-success { background: #10b981; } .btn-warning { background: #d97706; } .btn-info { background: #0284c7; }
+        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card { background: #111827; border: 1px solid #374151; padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .order-admin-item { display: grid; grid-template-columns: 3fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px; background: #111827; padding: 10px; border-radius: 8px; }
         .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
     </style>
@@ -378,7 +133,7 @@
         </div>
     </div>
 
-    <header id="mainHeader" style="text-align: center;">
+    <header id="mainHeader">
         <h1 id="headerTitle" style="font-size: 1.6rem;">בית המדרש "מבקשי פניך"</h1>
         <p id="headerSubtitle">תורה • תפילה • גמילות חסדים</p>
     </header>
@@ -397,37 +152,25 @@
             </div>
 
             <div class="admin-section" style="background: #1e293b; border: 2px solid #10b981;">
-                <h3 style="color: #34d399; margin-top:0;">🚀 גיבוי מערכת</h3>
-                <button class="btn-action btn-success" onclick="exportCompleteHtmlFile()">📥 הורד קובץ HTML מעודכן למחשב</button>
+                <h3 style="color: #34d399; margin-top:0;">🚀 סנכרון אוטומטי וגיבוי</h3>
+                <button class="btn-action btn-success" onclick="resetShabbatToAuto()">🔄 טען אוטומטית פרשה והפטרה לפי התאריך</button>
+                <button class="btn-action btn-info" onclick="exportCompleteHtmlFile()" style="margin-right: 10px;">📥 הורד קובץ HTML מעודכן למחשב</button>
             </div>
 
             <div class="admin-section">
-                <h3>🌅 חישוב אוטומטי של תפילות לפי שקיעה</h3>
-                <label><input type="checkbox" id="sunsetAutoUpdateActive" onchange="toggleSunsetSettings()"> הפעל חישוב תפילות אוטומטי לפי שקיעה (מתעדכן במוצ"ש לכל השבוע)</label>
-                <div id="sunsetDetailsContainer" style="margin-top: 10px; display: none;">
-                    <div class="grid-2col">
-                        <div>
-                            <label>מנחה (דקות לפני השקיעה):</label>
-                            <input type="number" id="minchaOffsetInput" value="25">
-                        </div>
-                        <div>
-                            <label>ערבית (דקות אחרי השקיעה):</label>
-                            <input type="number" id="arvitOffsetInput" value="20">
-                        </div>
-                    </div>
-                    <button class="btn-action btn-info" onclick="forceSunsetRecalculation()">🔄 בצע חישוב שבועי כעת</button>
-                </div>
-            </div>
-
-            <div class="admin-section" id="adminPasswordSection">
-                <h3>🔐 שינוי סיסמת מנהל</h3>
-                <label for="currentAdminPasswordInput">סיסמה נוכחית:</label>
-                <input type="password" id="currentAdminPasswordInput" placeholder="הסיסמה הנוכחית">
-                <label for="newAdminPasswordInput">סיסמה חדשה:</label>
-                <input type="password" id="newAdminPasswordInput" placeholder="לפחות 4 תווים">
-                <label for="confirmAdminPasswordInput">אימות סיסמה חדשה:</label>
-                <input type="password" id="confirmAdminPasswordInput" placeholder="הקלד שוב את הסיסמה החדשה" onkeydown="if(event.key === 'Enter') saveAdminPassword()">
-                <button class="btn-action btn-warning" onclick="saveAdminPassword()">שמור סיסמה חדשה</button>
+                <h3>🕯️ זמני שבת קודש</h3>
+                <label>פרשת השבוע:</label>
+                <input type="text" id="parashaInput" placeholder="שם הפרשה">
+                <label>הפטרה:</label>
+                <input type="text" id="haftarahInput" placeholder="שם ההפטרה">
+                <h4 style="color:#60a5fa; margin:10px 0 5px 0;">יום שישי</h4>
+                <div id="fridayItemsContainer"></div>
+                <button class="btn-action btn-success" onclick="addShabbatItem('friday')">+ הוסף ליום שישי</button>
+                <h4 style="color:#60a5fa; margin:15px 0 5px 0;">יום שבת</h4>
+                <div id="saturdayItemsContainer"></div>
+                <button class="btn-action btn-success" onclick="addShabbatItem('saturday')">+ הוסף ליום שבת</button>
+                <br><br>
+                <button class="btn-action" onclick="saveShabbatData()">שמור זמני שבת</button>
             </div>
 
             <div class="admin-section">
@@ -441,22 +184,6 @@
                 <div id="weekdayItemsContainer"></div>
                 <button class="btn-action btn-success" onclick="addWeekdayItem()">+ הוסף תיבה</button>
                 <button class="btn-action" onclick="saveWeekdayTimes()">שמור זמני חול</button>
-            </div>
-
-            <div class="admin-section">
-                <h3>🕯️ זמני שבת קודש</h3>
-                <label>פרשת השבוע:</label>
-                <input type="text" id="parashaInput" placeholder="שם הפרשה (מושג אוטומטית אם ריק)">
-                <label>הפטרה:</label>
-                <input type="text" id="haftarahInput" placeholder="שם ההפטרה (מושג אוטומטית אם ריק)">
-                <h4 style="color:#60a5fa; margin:10px 0 5px 0;">יום שישי</h4>
-                <div id="fridayItemsContainer"></div>
-                <button class="btn-action btn-success" onclick="addShabbatItem('friday')">+ הוסף ליום שישי</button>
-                <h4 style="color:#60a5fa; margin:15px 0 5px 0;">יום שבת</h4>
-                <div id="saturdayItemsContainer"></div>
-                <button class="btn-action btn-success" onclick="addShabbatItem('saturday')">+ הוסף ליום שבת</button>
-                <br><br>
-                <button class="btn-action" onclick="saveShabbatData()">שמור זמני שבת</button>
             </div>
 
             <div class="admin-section">
@@ -499,7 +226,8 @@
 
             <div class="admin-section">
                 <h3>📜 הלכה יומית</h3>
-                <textarea id="halachaInput" placeholder="הכנס הלכה..."></textarea>
+                <label>עריכת תוכן ההלכה היומית:</label>
+                <textarea id="halachaInput" placeholder="הכנס טקסט להלכה היומית..."></textarea>
                 <div class="grid-3col" style="margin-top: 10px;">
                     <div><label>גודל גופן (rem):</label><input type="number" id="halachaFontSizeInput" step="0.1" value="2.3"></div>
                     <div><label>צבע טקסט:</label><input type="color" id="halachaTextColorInput" value="#f9fafb"></div>
@@ -527,10 +255,37 @@
 
     <script>
         const DEFAULT_ADMIN_PASSWORD = "1234";
-        const ADMIN_PASSWORD_STORAGE_KEY = 'mp_admin_password';
+
+        const shabbatCalendarSchedule = {
+            "2026-08-15": { parasha: "פרשת שופטים", haftarah: "ישעיהו נ\"א, י\"ב - נ\"ב, י\"ב (אנכי אנכי)" },
+            "2026-08-22": { parasha: "פרשת כי תצא", haftarah: "ישעיהו נ\"ד, א' - י' (רני עקרה)" },
+            "2026-08-29": { parasha: "פרשת כי תבוא", haftarah: "ישעיהו ס', א' - כ\"ב (קומי אורי)" },
+            "2026-09-05": { parasha: "פרשת נצבים-וילך", haftarah: "ישעיהו ש\"א, י' - ש\"ב, י\"ב (שוש אשיש)" },
+            "2026-09-12": { parasha: "ראש השנה", haftarah: "שמואל א' א', א' - ב', י'" },
+            "2026-09-19": { parasha: "פרשת האזינו (שבת שובה)", haftarah: "הושע י\"ד, ב' - י' (שובה ישראל)" }
+        };
+
+        function getComingSaturdayISO() {
+            const d = new Date();
+            const dayOfWeek = d.getDay();
+            const daysUntilSat = (6 - dayOfWeek + 7) % 7;
+            d.setDate(d.getDate() + daysUntilSat);
+            return d.toISOString().split('T')[0];
+        }
+
+        function getAutoShabbatDetails() {
+            const satKey = getComingSaturdayISO();
+            if (shabbatCalendarSchedule[satKey]) {
+                return shabbatCalendarSchedule[satKey];
+            }
+            return {
+                parasha: "פרשת שופטים",
+                haftarah: "ישעיהו נ\"א, י\"ב - נ\"ב, י\"ב (אנכי אנכי)"
+            };
+        }
 
         function getAdminPassword() {
-            return localStorage.getItem(ADMIN_PASSWORD_STORAGE_KEY) || DEFAULT_ADMIN_PASSWORD;
+            return localStorage.getItem('mp_admin_password') || DEFAULT_ADMIN_PASSWORD;
         }
 
         window.addEventListener('keydown', function(e) {
@@ -559,36 +314,13 @@
             } else {
                 alert('סיסמה שגויה!');
                 document.getElementById('adminPasswordInput').value = '';
-                document.getElementById('adminPasswordInput').focus();
             }
-        }
-
-        function saveAdminPassword() {
-            const current = document.getElementById('currentAdminPasswordInput').value;
-            const next = document.getElementById('newAdminPasswordInput').value;
-            const confirm = document.getElementById('confirmAdminPasswordInput').value;
-
-            if (current !== getAdminPassword()) {
-                alert('הסיסמה הנוכחית שגויה.');
-                return;
-            }
-            if (next.length < 4) {
-                alert('הסיסמה החדשה חייבת להכיל לפחות 4 תווים.');
-                return;
-            }
-            if (next !== confirm) {
-                alert('הסיסמאות החדשות אינן זהות.');
-                return;
-            }
-
-            localStorage.setItem(ADMIN_PASSWORD_STORAGE_KEY, next);
-            alert('סיסמת המנהל עודכנה בהצלחה.');
         }
 
         const autoHalachot = [
-            "אמר רבי אלעזר אמר רבי חנינא, תלמידי חכמים מרבים שלום בעולם, שנאמר וכל בניך לימודי ה' ורב שלום בניך.",
-            "טוב לימוד התורה עם דרך ארץ, שיגעשת שניהם משכנת עוון.",
-            "הוי זנאי לכל אדם בקדמת שלום, והיה מקבל את כל האדם בסבר פנים יפות.",
+            "אמר רבי אלעזר אמר רבי חנינא: תלמידי חכמים מרבים שלום בעולם, שנאמר 'וכל בניך לימודי ה' ורב שלום בניך'.",
+            "יפה תלמוד תורה עם דרך ארץ, שיגעת שניהם משכחת עוון.",
+            "הוי מקדים שלום לכל אדם, והיה מקבל את כל האדם בסבר פנים יפות.",
             "על שלושה דברים העולם עומד: על התורה, ועל העבודה, ועל גמילות חסדים."
         ];
 
@@ -602,18 +334,9 @@
             return autoHalachot[dayOfYear % autoHalachot.length];
         }
 
-        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || {
-            title: 'בית המדרש "מבקשי פניך"',
-            subtitle: 'תורה • תפילה • גמילות חסדים',
-            align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4
-        };
-
+        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4 };
         let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
-        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || {
-            weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש',
-            shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית'
-        };
-
+        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
         let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorner', 'donation', 'halacha', 'gallery'];
 
         let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v3')) || [
@@ -622,22 +345,16 @@
             { title: 'ערבית', time: '19:45', fontSize: 2, titleColor: '#d1d5db', timeColor: '#ffffff' }
         ];
         
-        let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {
-            parasha: '',
-            haftarah: '',
-            fridayItems: [{ title: 'כניסת שבת', time: '18:45', fontSize: 2 }],
-            saturdayItems: [{ title: 'שחרית שבת', time: '08:30', fontSize: 2 }, { title: 'צאת השבת', time: '19:42', fontSize: 2 }]
-        };
+        let autoDefaults = getAutoShabbatDetails();
+        let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {};
 
-        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || {
-            active: false,
-            minchaOffset: 25,
-            arvitOffset: 20,
-            lastCalculatedWeek: ''
-        };
+        shabbatData.parasha = autoDefaults.parasha;
+        shabbatData.haftarah = autoDefaults.haftarah;
+        if (!shabbatData.fridayItems) shabbatData.fridayItems = [{ title: 'כניסת שבת', time: '18:45', fontSize: 2 }];
+        if (!shabbatData.saturdayItems) shabbatData.saturdayItems = [{ title: 'שחרית שבת', time: '08:30', fontSize: 2 }, { title: 'צאת השבת', time: '19:42', fontSize: 2 }];
 
-        let upcomingRoshChodeshText = localStorage.getItem('mp_rosh_chodesh_text') || '';
-
+        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || { active: false, minchaOffset: 25, arvitOffset: 20, lastCalculatedWeek: '' };
+        let upcomingRoshChodeshText = '';
         let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3')) || [];
         let customCorner = JSON.parse(localStorage.getItem('mp_custom_corner')) || { active: false, title: '', text: '', src: '' };
         let gallery = JSON.parse(localStorage.getItem('mp_gallery_v2')) || [];
@@ -651,18 +368,13 @@
         let isPaused = false;
 
         const orderedDays = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
-        const sectionNames = {
-            shiurim: '📖 שיעורים מרכזיים', weekday: '🕐 זמני תפילות ימי חול',
-            shabbat: '🕯️ זמני שבת קודש', customCorner: '📌 פינה מותאמת אישית',
-            donation: '💳 תרומות לאחזקת בית המדרש', halacha: '📜 הלכה יומית', gallery: '🖼️ גלריית פעילויות'
-        };
+        const sectionNames = { shiurim: '📖 שיעורים מרכזיים', weekday: '🕐 זמני תפילות ימי חול', shabbat: '🕯️ זמני שבת קודש', customCorner: '📌 פינה מותאמת אישית', donation: '💳 תרומות לאחזקת בית המדרש', halacha: '📜 הלכה יומית', gallery: '🖼️ גלריית פעילויות' };
 
         window.onload = function() {
             try {
                 document.getElementById('slideIntervalInput').value = slideInterval;
                 applyHeaderStyles();
-                fetchHebcalData();
-                checkAndPerformWeeklySunsetCalculation();
+                calculateInternalHebrewCalendar();
                 buildSlides();
                 startRotation();
 
@@ -688,109 +400,36 @@
             }
         };
 
-        function getWeekIdentifier(date) {
-            const d = new Date(date);
-            d.setHours(0, 0, 0, 0);
-            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-            const yearStart = new Date(d.getFullYear(), 0, 1);
-            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-            return `${d.getFullYear()}-W${weekNo}`;
-        }
+        function calculateInternalHebrewCalendar() {
+            const today = new Date();
+            const daysOfWeek = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+            let foundRoshChodesh = [];
 
-        async function fetchHebcalData() {
-            try {
-                const res = await fetch('https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&M=on');
-                const data = await res.json();
-                
-                if (data && data.items) {
-                    const parashaItem = data.items.find(i => i.category === 'parashat');
-                    if (parashaItem && !shabbatData.customParasha) {
-                        shabbatData.parasha = parashaItem.hebrew || parashaItem.title;
-                    }
-                    
-                    const haftarahItem = data.items.find(i => i.category === 'haftarah');
-                    if (haftarahItem && !shabbatData.customHaftarah) {
-                        shabbatData.haftarah = haftarahItem.hebrew || haftarahItem.title;
-                    }
+            for (let i = 0; i <= 7; i++) {
+                let testDate = new Date();
+                testDate.setDate(today.getDate() + i);
+                let formatter = new Intl.DateTimeFormat('he-IL-u-ca-hebrew', { day: 'numeric', month: 'long' });
+                let parts = formatter.formatToParts(testDate);
+                let dayHeb = parts.find(p => p.type === 'day')?.value || '';
+                let monthHeb = parts.find(p => p.type === 'month')?.value || '';
+
+                if (dayHeb.includes('א') || dayHeb.includes('ל') || dayHeb === '1' || dayHeb === '30') {
+                    let dayName = daysOfWeek[testDate.getDay()];
+                    foundRoshChodesh.push(`יום ${dayName} (ראש חודש ${monthHeb})`);
                 }
-
-                const today = new Date();
-                const startStr = today.toISOString().split('T')[0];
-                const nextWeek = new Date();
-                nextWeek.setDate(today.getDate() + 8);
-                const endStr = nextWeek.toISOString().split('T')[0];
-
-                const hRes = await fetch(`https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=off&mod=on&start=${startStr}&end=${endStr}`);
-                const hData = await hRes.json();
-                
-                if (hData && hData.items) {
-                    const rcItem = hData.items.find(i => i.category === 'roshchodesh');
-                    if (rcItem) {
-                        upcomingRoshChodeshText = `📣 ${rcItem.hebrew || rcItem.title}`;
-                        localStorage.setItem('mp_rosh_chodesh_text', upcomingRoshChodeshText);
-                    } else {
-                        upcomingRoshChodeshText = '';
-                        localStorage.removeItem('mp_rosh_chodesh_text');
-                    }
-                }
-                buildSlides();
-            } catch (e) {
-                console.log('Hebcal API fallback active');
             }
+
+            upcomingRoshChodeshText = foundRoshChodesh.length > 0 ? foundRoshChodesh.join(' ו-') : '';
         }
 
-        function checkAndPerformWeeklySunsetCalculation() {
-            if (!sunsetConfig.active) return;
-            
-            const currentWeek = getWeekIdentifier(new Date());
-            if (sunsetConfig.lastCalculatedWeek !== currentWeek) {
-                calculateWeeklyPrayerTimes();
-            }
-        }
-
-        async function calculateWeeklyPrayerTimes() {
-            try {
-                const today = new Date();
-                const dateStr = today.toISOString().split('T')[0];
-                const res = await fetch(`https://www.hebcal.com/zmanim?cfg=json&geonameid=293397&date=${dateStr}`);
-                const data = await res.json();
-                
-                if (data && data.times && data.times.sunset) {
-                    const sunsetDate = new Date(data.times.sunset);
-                    
-                    const minchaDate = new Date(sunsetDate.getTime() - (sunsetConfig.minchaOffset * 60000));
-                    const arvitDate = new Date(sunsetDate.getTime() + (sunsetConfig.arvitOffset * 60000));
-
-                    const formatTime = d => d.toTimeString().substring(0, 5);
-
-                    let minchaItem = weekdayTimes.find(i => i.title.includes('מנחה'));
-                    if (minchaItem) minchaItem.time = formatTime(minchaDate);
-                    
-                    let arvitItem = weekdayTimes.find(i => i.title.includes('ערבית'));
-                    if (arvitItem) arvitItem.time = formatTime(arvitDate);
-
-                    sunsetConfig.lastCalculatedWeek = getWeekIdentifier(today);
-                    localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
-                    localStorage.setItem('mp_weekday_times_v3', JSON.stringify(weekdayTimes));
-                    buildSlides();
-                }
-            } catch (e) {
-                console.log('Error calculating sunset times:', e);
-            }
-        }
-
-        function forceSunsetRecalculation() {
-            sunsetConfig.minchaOffset = parseInt(document.getElementById('minchaOffsetInput').value) || 25;
-            sunsetConfig.arvitOffset = parseInt(document.getElementById('arvitOffsetInput').value) || 20;
-            calculateWeeklyPrayerTimes();
-            alert('זמני התפילות חושבו מחדש לשבוע הקרוב!');
-        }
-
-        function toggleSunsetSettings() {
-            const active = document.getElementById('sunsetAutoUpdateActive').checked;
-            sunsetConfig.active = active;
-            document.getElementById('sunsetDetailsContainer').style.display = active ? 'block' : 'none';
-            localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
+        function resetShabbatToAuto() {
+            const autoInfo = getAutoShabbatDetails();
+            shabbatData.parasha = autoInfo.parasha;
+            shabbatData.haftarah = autoInfo.haftarah;
+            localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
+            renderAdminData();
+            buildSlides();
+            alert('הפרשה וההפטרה סונכרנו בהצלחה לשבת הקרובה!');
         }
 
         function applyHeaderStyles() {
@@ -798,10 +437,7 @@
             const h1 = document.getElementById('headerTitle');
             const p = document.getElementById('headerSubtitle');
             if(header) header.style.textAlign = headerConfig.align || 'center';
-            if(h1) {
-                h1.innerText = headerConfig.title || 'בית המדרש "מבקשי פניך"';
-                h1.style.fontSize = (headerConfig.fontSize || 1.6) + 'rem';
-            }
+            if(h1) { h1.innerText = headerConfig.title || 'בית המדרש "מבקשי פניך"'; h1.style.fontSize = (headerConfig.fontSize || 1.6) + 'rem'; }
             if(p) p.innerText = headerConfig.subtitle || '';
         }
 
@@ -822,13 +458,29 @@
 
             const slideTitleStyle = `text-align: ${headerConfig.slideAlign || 'center'}; font-size: ${headerConfig.slideFontSize || 1.4}rem;`;
 
+            const effParasha = shabbatData.parasha || autoDefaults.parasha;
+            const effHaftarah = shabbatData.haftarah || autoDefaults.haftarah;
+
             sectionOrder.forEach(secKey => {
                 if (secKey === 'weekday') {
+                    if (upcomingRoshChodeshText) {
+                        const rcSlide = document.createElement('div');
+                        rcSlide.className = 'slide';
+                        rcSlide.innerHTML = `
+                            <div class="slide-title" style="${slideTitleStyle}">הודעה מיוחדת לשבוע זה</div>
+                            <div class="rosh-chodesh-card">
+                                <h2>🌙 ראש חודש קרוב</h2>
+                                <p>שבוע טוב! בשבוע זה יחול <strong>${upcomingRoshChodeshText}</strong></p>
+                            </div>
+                        `;
+                        display.appendChild(rcSlide);
+                        slides.push(rcSlide);
+                    }
+
                     const timesSlide = document.createElement('div');
                     timesSlide.className = 'slide';
                     timesSlide.innerHTML = `
                         <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.weekday}</div>
-                        ${upcomingRoshChodeshText ? `<div class="rosh-chodesh-banner">${upcomingRoshChodeshText}</div>` : ''}
                         <div class="times-grid">${weekdayTimes.map(item => createTimeBoxHtml(item)).join('')}</div>
                     `;
                     display.appendChild(timesSlide);
@@ -839,11 +491,11 @@
                     const shabbatSlide = document.createElement('div');
                     shabbatSlide.className = 'slide';
                     shabbatSlide.innerHTML = `
-                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} ${shabbatData.parasha ? `- ${shabbatData.parasha}` : ''}</div>
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${effParasha}</div>
                         <div class="shabbat-container">
+                            <div class="haftarah-info-bar-top">📖 הפטרה: ${effHaftarah}</div>
                             <div class="shabbat-section-title">🕯️ יום שישי</div><div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                             <div class="shabbat-section-title">☀️ יום שבת</div><div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
-                            ${shabbatData.haftarah ? `<div class="haftarah-info-bar">📖 הפטרה: ${shabbatData.haftarah}</div>` : ''}
                         </div>
                     `;
                     display.appendChild(shabbatSlide);
@@ -971,9 +623,7 @@
             headerConfig.align = document.getElementById('headerAlignInput').value;
             headerConfig.fontSize = parseFloat(document.getElementById('headerFontSizeInput').value) || 1.6;
             localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
-            alert('נשמר!');
-            applyHeaderStyles();
-            buildSlides();
+            alert('נשמר!'); applyHeaderStyles(); buildSlides();
         }
 
         function saveHalachaData() {
@@ -982,8 +632,7 @@
             halachaConfig.style = document.getElementById('halachaFontStyleInput').value || 'normal';
             localStorage.setItem('mp_halacha', document.getElementById('halachaInput').value);
             localStorage.setItem('mp_halacha_config', JSON.stringify(halachaConfig));
-            alert('נשמר!');
-            buildSlides();
+            alert('הלכה יומית נשמרה בהצלחה!'); buildSlides();
         }
 
         function renderSectionOrderAdmin() {
@@ -1010,8 +659,7 @@
 
         function saveSectionOrder() {
             localStorage.setItem('mp_section_order', JSON.stringify(sectionOrder));
-            alert('סדר השקופיות נשמר!');
-            buildSlides();
+            alert('סדר השקופיות נשמר!'); buildSlides();
         }
 
         function renderWeekdayAdminItems() {
@@ -1027,6 +675,7 @@
                 </div>
             `).join('');
         }
+
         function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00' }); renderWeekdayAdminItems(); }
         function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v3', JSON.stringify(weekdayTimes)); alert('נשמר!'); buildSlides(); }
 
@@ -1050,20 +699,18 @@
                 `).join('');
             }
         }
+
         function addShabbatItem(day) { shabbatData[day === 'friday' ? 'fridayItems' : 'saturdayItems'].push({ title: 'חדש', time: '00:00' }); renderShabbatAdminItems(); }
+        
         function saveShabbatData() {
             const parashaElem = document.getElementById('parashaInput');
-            if(parashaElem) {
-                shabbatData.parasha = parashaElem.value;
-                shabbatData.customParasha = !!parashaElem.value;
-            }
+            if(parashaElem) shabbatData.parasha = parashaElem.value || autoDefaults.parasha;
+            
             const haftarahElem = document.getElementById('haftarahInput');
-            if(haftarahElem) {
-                shabbatData.haftarah = haftarahElem.value;
-                shabbatData.customHaftarah = !!haftarahElem.value;
-            }
+            if(haftarahElem) shabbatData.haftarah = haftarahElem.value || autoDefaults.haftarah;
+
             localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
-            alert('נשמר!');
+            alert('זמני שבת, הפרשה וההפטרה נשמרו בהצלחה!');
             buildSlides();
         }
 
@@ -1091,10 +738,7 @@
         function handleShiurImageUpload(input, idx) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = e => {
-                    shiurimByDays[idx].src = e.target.result;
-                    renderShiurimAdminItems();
-                };
+                reader.onload = e => { shiurimByDays[idx].src = e.target.result; renderShiurimAdminItems(); };
                 reader.readAsDataURL(input.files[0]);
             }
         }
@@ -1105,10 +749,7 @@
         function renderGalleryAdminItems() {
             const container = document.getElementById('galleryAdminList');
             if(!container) return;
-            if (gallery.length === 0) {
-                container.innerHTML = '<div style="color:#9ca3af; padding:10px;">אין תמונות בגלריה.</div>';
-                return;
-            }
+            if (gallery.length === 0) { container.innerHTML = '<div style="color:#9ca3af; padding:10px;">אין תמונות בגלריה.</div>'; return; }
             container.innerHTML = gallery.map((g, idx) => `
                 <div class="gallery-admin-card">
                     <div class="gallery-admin-card-header"><strong>תמונה #${idx+1}</strong><button class="btn-action btn-danger" onclick="gallery.splice(${idx},1);renderGalleryAdminItems();buildSlides();">מחק</button></div>
@@ -1117,6 +758,7 @@
                 </div>
             `).join('');
         }
+
         function triggerGalleryUpload() { document.getElementById('activityImgInput').click(); }
         function handleGalleryImageUpload(input) {
             if (input.files && input.files[0]) {
@@ -1124,9 +766,7 @@
                 reader.onload = e => {
                     gallery.push({ id: Date.now(), title: 'פעילות', src: e.target.result });
                     localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery));
-                    renderGalleryAdminItems();
-                    buildSlides();
-                    input.value = '';
+                    renderGalleryAdminItems(); buildSlides(); input.value = '';
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -1140,41 +780,18 @@
             const fileInput = document.getElementById('customCornerImgInput');
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(evt) {
-                    customCorner.src = evt.target.result;
-                    localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner));
-                    alert('נשמר!');
-                    renderAdminData();
-                    buildSlides();
-                };
+                reader.onload = function(evt) { customCorner.src = evt.target.result; localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner)); alert('נשמר!'); renderAdminData(); buildSlides(); };
                 reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner));
-                alert('נשמר!');
-                buildSlides();
-            }
+            } else { localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner)); alert('נשמר!'); buildSlides(); }
         }
 
         function saveDonationData() {
             sectionTitles.donation = document.getElementById('donationTitleInput').value || sectionTitles.donation;
             localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
-            alert('נשמר!');
-            buildSlides();
+            alert('נשמר!'); buildSlides();
         }
 
         function renderAdminData() {
-            const currInput = document.getElementById('currentAdminPasswordInput');
-            if (currInput) currInput.value = '';
-            const newPassInput = document.getElementById('newAdminPasswordInput');
-            if (newPassInput) newPassInput.value = '';
-            const confirmPassInput = document.getElementById('confirmAdminPasswordInput');
-            if (confirmPassInput) confirmPassInput.value = '';
-
-            document.getElementById('sunsetAutoUpdateActive').checked = sunsetConfig.active;
-            document.getElementById('sunsetDetailsContainer').style.display = sunsetConfig.active ? 'block' : 'none';
-            document.getElementById('minchaOffsetInput').value = sunsetConfig.minchaOffset || 25;
-            document.getElementById('arvitOffsetInput').value = sunsetConfig.arvitOffset || 20;
-
             document.getElementById('headerTitleInput').value = headerConfig.title || '';
             document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
@@ -1183,10 +800,10 @@
             document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 2.3;
             document.getElementById('halachaTextColorInput').value = halachaConfig.color || '#f9fafb';
             document.getElementById('halachaFontStyleInput').value = halachaConfig.style || 'normal';
-            document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || '';
+            document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || getDailyHalacha();
 
-            document.getElementById('parashaInput').value = shabbatData.parasha || '';
-            document.getElementById('haftarahInput').value = shabbatData.haftarah || '';
+            document.getElementById('parashaInput').value = shabbatData.parasha || autoDefaults.parasha;
+            document.getElementById('haftarahInput').value = shabbatData.haftarah || autoDefaults.haftarah;
             document.getElementById('donationTitleInput').value = sectionTitles.donation || '';
 
             renderSectionOrderAdmin();
@@ -1204,8 +821,7 @@
 
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
-
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha', 'mp_admin_password', 'mp_rosh_chodesh_text'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha', 'mp_admin_password'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
 
