@@ -126,6 +126,33 @@
             width: 100%;
         }
 
+        .rosh-chodesh-banner {
+            background: linear-gradient(90deg, #1e3a8a, #0284c7);
+            color: #ffffff;
+            width: 95%;
+            max-width: 1400px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 1px solid #38bdf8;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .haftarah-info-bar {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid #1e3a8a;
+            width: 100%;
+        }
+
         .shiur-info-bar {
             background: #1e293b;
             width: 100%;
@@ -339,7 +366,6 @@
 
     <div class="corner-settings-btn" onclick="requestPassword()" title="הגדרות">⚙️</div>
 
-    <!-- חלון הזנת סיסמה -->
     <div class="password-modal" id="passwordModal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <h2>כניסת מנהל</h2>
@@ -363,7 +389,6 @@
 
     <div class="main-display" id="mainDisplay"></div>
 
-    <!-- לוח בקרה מנהל -->
     <div class="admin-modal" id="adminModal">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -374,6 +399,24 @@
             <div class="admin-section" style="background: #1e293b; border: 2px solid #10b981;">
                 <h3 style="color: #34d399; margin-top:0;">🚀 גיבוי מערכת</h3>
                 <button class="btn-action btn-success" onclick="exportCompleteHtmlFile()">📥 הורד קובץ HTML מעודכן למחשב</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>🌅 חישוב אוטומטי של תפילות לפי שקיעה</h3>
+                <label><input type="checkbox" id="sunsetAutoUpdateActive" onchange="toggleSunsetSettings()"> הפעל חישוב תפילות אוטומטי לפי שקיעה (מתעדכן במוצ"ש לכל השבוע)</label>
+                <div id="sunsetDetailsContainer" style="margin-top: 10px; display: none;">
+                    <div class="grid-2col">
+                        <div>
+                            <label>מנחה (דקות לפני השקיעה):</label>
+                            <input type="number" id="minchaOffsetInput" value="25">
+                        </div>
+                        <div>
+                            <label>ערבית (דקות אחרי השקיעה):</label>
+                            <input type="number" id="arvitOffsetInput" value="20">
+                        </div>
+                    </div>
+                    <button class="btn-action btn-info" onclick="forceSunsetRecalculation()">🔄 בצע חישוב שבועי כעת</button>
+                </div>
             </div>
 
             <div class="admin-section" id="adminPasswordSection">
@@ -403,7 +446,9 @@
             <div class="admin-section">
                 <h3>🕯️ זמני שבת קודש</h3>
                 <label>פרשת השבוע:</label>
-                <input type="text" id="parashaInput" placeholder="שם הפרשה">
+                <input type="text" id="parashaInput" placeholder="שם הפרשה (מושג אוטומטית אם ריק)">
+                <label>הפטרה:</label>
+                <input type="text" id="haftarahInput" placeholder="שם ההפטרה (מושג אוטומטית אם ריק)">
                 <h4 style="color:#60a5fa; margin:10px 0 5px 0;">יום שישי</h4>
                 <div id="fridayItemsContainer"></div>
                 <button class="btn-action btn-success" onclick="addShabbatItem('friday')">+ הוסף ליום שישי</button>
@@ -578,10 +623,20 @@
         ];
         
         let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {
-            parasha: 'פרשת השבוע',
+            parasha: '',
+            haftarah: '',
             fridayItems: [{ title: 'כניסת שבת', time: '18:45', fontSize: 2 }],
             saturdayItems: [{ title: 'שחרית שבת', time: '08:30', fontSize: 2 }, { title: 'צאת השבת', time: '19:42', fontSize: 2 }]
         };
+
+        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || {
+            active: false,
+            minchaOffset: 25,
+            arvitOffset: 20,
+            lastCalculatedWeek: ''
+        };
+
+        let upcomingRoshChodeshText = localStorage.getItem('mp_rosh_chodesh_text') || '';
 
         let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3')) || [];
         let customCorner = JSON.parse(localStorage.getItem('mp_custom_corner')) || { active: false, title: '', text: '', src: '' };
@@ -606,6 +661,8 @@
             try {
                 document.getElementById('slideIntervalInput').value = slideInterval;
                 applyHeaderStyles();
+                fetchHebcalData();
+                checkAndPerformWeeklySunsetCalculation();
                 buildSlides();
                 startRotation();
 
@@ -630,6 +687,111 @@
                 startRotation();
             }
         };
+
+        function getWeekIdentifier(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return `${d.getFullYear()}-W${weekNo}`;
+        }
+
+        async function fetchHebcalData() {
+            try {
+                const res = await fetch('https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&M=on');
+                const data = await res.json();
+                
+                if (data && data.items) {
+                    const parashaItem = data.items.find(i => i.category === 'parashat');
+                    if (parashaItem && !shabbatData.customParasha) {
+                        shabbatData.parasha = parashaItem.hebrew || parashaItem.title;
+                    }
+                    
+                    const haftarahItem = data.items.find(i => i.category === 'haftarah');
+                    if (haftarahItem && !shabbatData.customHaftarah) {
+                        shabbatData.haftarah = haftarahItem.hebrew || haftarahItem.title;
+                    }
+                }
+
+                const today = new Date();
+                const startStr = today.toISOString().split('T')[0];
+                const nextWeek = new Date();
+                nextWeek.setDate(today.getDate() + 8);
+                const endStr = nextWeek.toISOString().split('T')[0];
+
+                const hRes = await fetch(`https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=off&mod=on&start=${startStr}&end=${endStr}`);
+                const hData = await hRes.json();
+                
+                if (hData && hData.items) {
+                    const rcItem = hData.items.find(i => i.category === 'roshchodesh');
+                    if (rcItem) {
+                        upcomingRoshChodeshText = `📣 ${rcItem.hebrew || rcItem.title}`;
+                        localStorage.setItem('mp_rosh_chodesh_text', upcomingRoshChodeshText);
+                    } else {
+                        upcomingRoshChodeshText = '';
+                        localStorage.removeItem('mp_rosh_chodesh_text');
+                    }
+                }
+                buildSlides();
+            } catch (e) {
+                console.log('Hebcal API fallback active');
+            }
+        }
+
+        function checkAndPerformWeeklySunsetCalculation() {
+            if (!sunsetConfig.active) return;
+            
+            const currentWeek = getWeekIdentifier(new Date());
+            if (sunsetConfig.lastCalculatedWeek !== currentWeek) {
+                calculateWeeklyPrayerTimes();
+            }
+        }
+
+        async function calculateWeeklyPrayerTimes() {
+            try {
+                const today = new Date();
+                const dateStr = today.toISOString().split('T')[0];
+                const res = await fetch(`https://www.hebcal.com/zmanim?cfg=json&geonameid=293397&date=${dateStr}`);
+                const data = await res.json();
+                
+                if (data && data.times && data.times.sunset) {
+                    const sunsetDate = new Date(data.times.sunset);
+                    
+                    const minchaDate = new Date(sunsetDate.getTime() - (sunsetConfig.minchaOffset * 60000));
+                    const arvitDate = new Date(sunsetDate.getTime() + (sunsetConfig.arvitOffset * 60000));
+
+                    const formatTime = d => d.toTimeString().substring(0, 5);
+
+                    let minchaItem = weekdayTimes.find(i => i.title.includes('מנחה'));
+                    if (minchaItem) minchaItem.time = formatTime(minchaDate);
+                    
+                    let arvitItem = weekdayTimes.find(i => i.title.includes('ערבית'));
+                    if (arvitItem) arvitItem.time = formatTime(arvitDate);
+
+                    sunsetConfig.lastCalculatedWeek = getWeekIdentifier(today);
+                    localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
+                    localStorage.setItem('mp_weekday_times_v3', JSON.stringify(weekdayTimes));
+                    buildSlides();
+                }
+            } catch (e) {
+                console.log('Error calculating sunset times:', e);
+            }
+        }
+
+        function forceSunsetRecalculation() {
+            sunsetConfig.minchaOffset = parseInt(document.getElementById('minchaOffsetInput').value) || 25;
+            sunsetConfig.arvitOffset = parseInt(document.getElementById('arvitOffsetInput').value) || 20;
+            calculateWeeklyPrayerTimes();
+            alert('זמני התפילות חושבו מחדש לשבוע הקרוב!');
+        }
+
+        function toggleSunsetSettings() {
+            const active = document.getElementById('sunsetAutoUpdateActive').checked;
+            sunsetConfig.active = active;
+            document.getElementById('sunsetDetailsContainer').style.display = active ? 'block' : 'none';
+            localStorage.setItem('mp_sunset_config', JSON.stringify(sunsetConfig));
+        }
 
         function applyHeaderStyles() {
             const header = document.getElementById('mainHeader');
@@ -666,6 +828,7 @@
                     timesSlide.className = 'slide';
                     timesSlide.innerHTML = `
                         <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.weekday}</div>
+                        ${upcomingRoshChodeshText ? `<div class="rosh-chodesh-banner">${upcomingRoshChodeshText}</div>` : ''}
                         <div class="times-grid">${weekdayTimes.map(item => createTimeBoxHtml(item)).join('')}</div>
                     `;
                     display.appendChild(timesSlide);
@@ -676,10 +839,11 @@
                     const shabbatSlide = document.createElement('div');
                     shabbatSlide.className = 'slide';
                     shabbatSlide.innerHTML = `
-                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${shabbatData.parasha}</div>
+                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} ${shabbatData.parasha ? `- ${shabbatData.parasha}` : ''}</div>
                         <div class="shabbat-container">
                             <div class="shabbat-section-title">🕯️ יום שישי</div><div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                             <div class="shabbat-section-title">☀️ יום שבת</div><div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
+                            ${shabbatData.haftarah ? `<div class="haftarah-info-bar">📖 הפטרה: ${shabbatData.haftarah}</div>` : ''}
                         </div>
                     `;
                     display.appendChild(shabbatSlide);
@@ -889,7 +1053,15 @@
         function addShabbatItem(day) { shabbatData[day === 'friday' ? 'fridayItems' : 'saturdayItems'].push({ title: 'חדש', time: '00:00' }); renderShabbatAdminItems(); }
         function saveShabbatData() {
             const parashaElem = document.getElementById('parashaInput');
-            if(parashaElem) shabbatData.parasha = parashaElem.value;
+            if(parashaElem) {
+                shabbatData.parasha = parashaElem.value;
+                shabbatData.customParasha = !!parashaElem.value;
+            }
+            const haftarahElem = document.getElementById('haftarahInput');
+            if(haftarahElem) {
+                shabbatData.haftarah = haftarahElem.value;
+                shabbatData.customHaftarah = !!haftarahElem.value;
+            }
             localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
             alert('נשמר!');
             buildSlides();
@@ -998,6 +1170,11 @@
             const confirmPassInput = document.getElementById('confirmAdminPasswordInput');
             if (confirmPassInput) confirmPassInput.value = '';
 
+            document.getElementById('sunsetAutoUpdateActive').checked = sunsetConfig.active;
+            document.getElementById('sunsetDetailsContainer').style.display = sunsetConfig.active ? 'block' : 'none';
+            document.getElementById('minchaOffsetInput').value = sunsetConfig.minchaOffset || 25;
+            document.getElementById('arvitOffsetInput').value = sunsetConfig.arvitOffset || 20;
+
             document.getElementById('headerTitleInput').value = headerConfig.title || '';
             document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
@@ -1009,6 +1186,7 @@
             document.getElementById('halachaInput').value = localStorage.getItem('mp_halacha') || '';
 
             document.getElementById('parashaInput').value = shabbatData.parasha || '';
+            document.getElementById('haftarahInput').value = shabbatData.haftarah || '';
             document.getElementById('donationTitleInput').value = sectionTitles.donation || '';
 
             renderSectionOrderAdmin();
@@ -1027,7 +1205,7 @@
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
 
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha', 'mp_admin_password'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha', 'mp_admin_password', 'mp_rosh_chodesh_text'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
 
