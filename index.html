@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl"><head>
+<html lang="he" dir="rtl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בית המדרש מבקשי פניך</title>
@@ -69,9 +70,7 @@
             transition: background 0.3s;
         }
 
-        .corner-settings-btn:hover {
-            background: var(--accent);
-        }
+        .corner-settings-btn:hover { background: var(--accent); }
 
         .time-progress-container {
             width: 100%;
@@ -334,66 +333,18 @@
 
         .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-        /* התאמה למסכים קטנים ולטלפונים */
-        @media (max-width: 680px) {
-            body { overflow: hidden; }
-
-            header { padding: 10px 58px 8px 58px; }
-            header h1 { font-size: 1.15rem !important; line-height: 1.35; }
-            header p { font-size: 0.8rem; }
-
-            .corner-settings-btn {
-                width: 52px;
-                height: 52px;
-                font-size: 1.35rem;
-                border-bottom-right-radius: 14px;
-            }
-
-            .main-display { padding: 5px; }
-            .slide { top: 5px; bottom: 5px; left: 5px; right: 5px; padding: 9px; }
-            .slide-title { font-size: 1.05rem !important; }
-            .times-grid, .shabbat-container { width: 100%; max-height: 78vh; padding: 4px; }
-            .times-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-            .shabbat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-            .time-box { padding: 12px 6px; border-right-width: 4px; }
-            .custom-box, .halacha-box { width: 100%; padding: 18px 14px; font-size: 1.25rem; }
-
-            .admin-modal, .password-modal { padding: 8px; align-items: flex-start; }
-            .modal-content {
-                max-height: calc(100vh - 16px);
-                border-radius: 12px;
-                padding: 16px 12px;
-                margin-top: 0;
-            }
-            .modal-content h2 { font-size: 1.35rem; }
-            .admin-section { padding: 13px 11px; margin-bottom: 12px; }
-            .admin-section h3 { font-size: 1.05rem; }
-            .grid-2col, .grid-3col { grid-template-columns: 1fr; gap: 6px; }
-            .order-admin-item { grid-template-columns: 1fr auto auto; gap: 6px; padding: 8px; }
-            .order-admin-item .btn-action { padding: 9px 11px; }
-            .btn-action { min-height: 44px; padding: 10px 14px; }
-            .admin-section > .btn-action { margin: 3px 0; }
-            input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea {
-                min-height: 44px;
-                font-size: 16px;
-            }
-            textarea { min-height: 120px; }
-            .password-modal .modal-content { margin-top: 12vh; }
-            .password-modal .btn-action { flex: 1; }
-        }
     </style>
 </head>
 <body>
 
-    <div class="corner-settings-btn" onclick="requestPassword()" title="כניסת מנהל" aria-label="כניסת מנהל" role="button" tabindex="0" onkeydown="if(event.key === 'Enter' || event.key === ' ') requestPassword()">⚙️</div>
+    <div class="corner-settings-btn" onclick="requestPassword()" title="הגדרות">⚙️</div>
 
     <!-- חלון הזנת סיסמה -->
     <div class="password-modal" id="passwordModal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <h2>כניסת מנהל</h2>
             <p>הקלד סיסמת ניהול:</p>
-            <input type="password" id="adminPasswordInput" placeholder="סיסמה" autocomplete="current-password" inputmode="text" style="text-align: center;" onkeydown="if(event.key === 'Enter') verifyPassword()">
+            <input type="password" id="adminPasswordInput" placeholder="סיסמה" style="text-align: center;" onkeydown="if(event.key === 'Enter') verifyPassword()">
             <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                 <button class="btn-action btn-success" onclick="verifyPassword()">כניסה</button>
                 <button class="btn-action btn-danger" onclick="closePasswordModal()">ביטול</button>
@@ -420,33 +371,28 @@
                 <button class="btn-action btn-danger" onclick="closeAdminModal()">סגור ✕</button>
             </div>
 
-            <!-- ייצוא ושמירה -->
             <div class="admin-section" style="background: #1e293b; border: 2px solid #10b981;">
                 <h3 style="color: #34d399; margin-top:0;">🚀 גיבוי מערכת</h3>
                 <button class="btn-action btn-success" onclick="exportCompleteHtmlFile()">📥 הורד קובץ HTML מעודכן למחשב</button>
             </div>
 
-            <!-- שינוי סיסמה - מותאם גם לטלפון -->
             <div class="admin-section" id="adminPasswordSection">
                 <h3>🔐 שינוי סיסמת מנהל</h3>
-                <p style="color:#9ca3af; margin-top:0;">אפשר לשנות את סיסמת הכניסה ישירות מהטלפון או מהמחשב.</p>
                 <label for="currentAdminPasswordInput">סיסמה נוכחית:</label>
-                <input type="password" id="currentAdminPasswordInput" autocomplete="current-password" placeholder="הסיסמה הנוכחית">
+                <input type="password" id="currentAdminPasswordInput" placeholder="הסיסמה הנוכחית">
                 <label for="newAdminPasswordInput">סיסמה חדשה:</label>
-                <input type="password" id="newAdminPasswordInput" autocomplete="new-password" placeholder="לפחות 4 תווים">
+                <input type="password" id="newAdminPasswordInput" placeholder="לפחות 4 תווים">
                 <label for="confirmAdminPasswordInput">אימות סיסמה חדשה:</label>
-                <input type="password" id="confirmAdminPasswordInput" autocomplete="new-password" placeholder="הקלד שוב את הסיסמה החדשה" onkeydown="if(event.key === 'Enter') saveAdminPassword()">
+                <input type="password" id="confirmAdminPasswordInput" placeholder="הקלד שוב את הסיסמה החדשה" onkeydown="if(event.key === 'Enter') saveAdminPassword()">
                 <button class="btn-action btn-warning" onclick="saveAdminPassword()">שמור סיסמה חדשה</button>
             </div>
 
-            <!-- סדר השקופיות -->
             <div class="admin-section">
                 <h3>🔄 סדר הופעת השקופיות</h3>
                 <div id="sectionOrderContainer"></div>
                 <button class="btn-action btn-success" onclick="saveSectionOrder()">שמור סדר שקופיות</button>
             </div>
 
-            <!-- זמני חול -->
             <div class="admin-section">
                 <h3>🕐 זמני תפילות ימי חול</h3>
                 <div id="weekdayItemsContainer"></div>
@@ -454,7 +400,6 @@
                 <button class="btn-action" onclick="saveWeekdayTimes()">שמור זמני חול</button>
             </div>
 
-            <!-- זמני שבת -->
             <div class="admin-section">
                 <h3>🕯️ זמני שבת קודש</h3>
                 <label>פרשת השבוע:</label>
@@ -469,7 +414,6 @@
                 <button class="btn-action" onclick="saveShabbatData()">שמור זמני שבת</button>
             </div>
 
-            <!-- שיעורים -->
             <div class="admin-section">
                 <h3>📖 שיעורים מרכזיים</h3>
                 <div id="shiurimAdminContainer"></div>
@@ -477,7 +421,6 @@
                 <button class="btn-action" onclick="saveShiurimData()">שמור שיעורים</button>
             </div>
 
-            <!-- תרומות -->
             <div class="admin-section">
                 <h3>💳 תרומות לאחזקת בית המדרש</h3>
                 <label>כותרת הפינה:</label>
@@ -488,7 +431,6 @@
                 <button class="btn-action" onclick="saveDonationData()">שמור תרומות</button>
             </div>
 
-            <!-- גלריית פעילויות -->
             <div class="admin-section">
                 <h3>🖼️ פעילות בית המדרש / גלריה</h3>
                 <input type="file" id="activityImgInput" accept="image/*" style="display:none;" onchange="handleGalleryImageUpload(this)">
@@ -497,7 +439,6 @@
                 <button class="btn-action" onclick="saveGalleryData()" style="margin-top:10px;">שמור גלריה</button>
             </div>
 
-            <!-- פינה מותאמת אישית -->
             <div class="admin-section">
                 <h3>📌 פינה מותאמת אישית</h3>
                 <label><input type="checkbox" id="customCornerActive"> הפעל פינה זו</label>
@@ -511,7 +452,6 @@
                 <button class="btn-action" onclick="saveCustomCorner()">שמור פינה אישית</button>
             </div>
 
-            <!-- הלכה יומית -->
             <div class="admin-section">
                 <h3>📜 הלכה יומית</h3>
                 <textarea id="halachaInput" placeholder="הכנס הלכה..."></textarea>
@@ -523,7 +463,6 @@
                 <button class="btn-action" onclick="saveHalachaData()" style="margin-top:10px;">שמור הלכה</button>
             </div>
 
-            <!-- הגדרות כלליות ותזמון -->
             <div class="admin-section">
                 <h3>⚙️ הגדרות תצוגה וכותרת</h3>
                 <label>כותרת ראשית:</label><input type="text" id="headerTitleInput">
@@ -542,7 +481,7 @@
     </div>
 
     <script>
-        const DEFAULT_ADMIN_PASSWORD = "1234"; // סיסמת ברירת המחדל בהפעלה הראשונה
+        const DEFAULT_ADMIN_PASSWORD = "1234";
         const ADMIN_PASSWORD_STORAGE_KEY = 'mp_admin_password';
 
         function getAdminPassword() {
@@ -586,24 +525,18 @@
 
             if (current !== getAdminPassword()) {
                 alert('הסיסמה הנוכחית שגויה.');
-                document.getElementById('currentAdminPasswordInput').focus();
                 return;
             }
             if (next.length < 4) {
                 alert('הסיסמה החדשה חייבת להכיל לפחות 4 תווים.');
-                document.getElementById('newAdminPasswordInput').focus();
                 return;
             }
             if (next !== confirm) {
                 alert('הסיסמאות החדשות אינן זהות.');
-                document.getElementById('confirmAdminPasswordInput').focus();
                 return;
             }
 
             localStorage.setItem(ADMIN_PASSWORD_STORAGE_KEY, next);
-            document.getElementById('currentAdminPasswordInput').value = '';
-            document.getElementById('newAdminPasswordInput').value = '';
-            document.getElementById('confirmAdminPasswordInput').value = '';
             alert('סיסמת המנהל עודכנה בהצלחה.');
         }
 
@@ -623,8 +556,6 @@
             const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
             return autoHalachot[dayOfYear % autoHalachot.length];
         }
-
-        let sunsetConfig = JSON.parse(localStorage.getItem('mp_sunset_config')) || { minBefore: 20 };
 
         let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || {
             title: 'בית המדרש "מבקשי פניך"',
@@ -677,7 +608,23 @@
                 applyHeaderStyles();
                 buildSlides();
                 startRotation();
-                renderAdminData();
+
+                const donElem = document.getElementById('donationImgInput');
+                if (donElem) {
+                    donElem.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(evt) {
+                                donationImg = evt.target.result;
+                                localStorage.setItem('mp_donation_img', donationImg);
+                                renderAdminData();
+                                buildSlides();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
             } catch (e) {
                 buildSlides();
                 startRotation();
@@ -1043,24 +990,14 @@
             buildSlides();
         }
 
-        document.getElementById('donationImgInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    donationImg = evt.target.result;
-                    localStorage.setItem('mp_donation_img', donationImg);
-                    renderAdminData();
-                    buildSlides();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
         function renderAdminData() {
-            document.getElementById('currentAdminPasswordInput').value = '';
-            document.getElementById('newAdminPasswordInput').value = '';
-            document.getElementById('confirmAdminPasswordInput').value = '';
+            const currInput = document.getElementById('currentAdminPasswordInput');
+            if (currInput) currInput.value = '';
+            const newPassInput = document.getElementById('newAdminPasswordInput');
+            if (newPassInput) newPassInput.value = '';
+            const confirmPassInput = document.getElementById('confirmAdminPasswordInput');
+            if (confirmPassInput) confirmPassInput.value = '';
+
             document.getElementById('headerTitleInput').value = headerConfig.title || '';
             document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
@@ -1089,10 +1026,6 @@
 
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
-            let modal = docClone.querySelector('#adminModal');
-            if (modal) modal.remove();
-            let passModal = docClone.querySelector('#passwordModal');
-            if (passModal) passModal.remove();
 
             let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_donation_img', 'mp_interval', 'mp_sunset_config', 'mp_halacha', 'mp_admin_password'];
             let storageData = {};
