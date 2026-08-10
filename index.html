@@ -54,6 +54,7 @@
             cursor: pointer; z-index: 99999; display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
             transition: background 0.3s;
+            touch-action: manipulation;
         }
         .corner-settings-btn:hover { background: var(--accent); }
 
@@ -122,8 +123,8 @@
         .modal-content { background: #111827; color: #f9fafb; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 25px; border: 1px solid #374151; }
         .admin-section { background: #030712; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f2937; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
-        input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; }
-        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; touch-action: manipulation; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; touch-action: manipulation; }
         .btn-danger { background: #dc2626; } .btn-success { background: #10b981; } .btn-warning { background: #d97706; } .btn-info { background: #0284c7; }
         .shiur-admin-card, .gallery-admin-card, .time-box-admin-card, .custom-corner-admin-card { background: #111827; border: 1px solid #374151; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
         .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header, .custom-corner-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
@@ -460,7 +461,6 @@
         }
 
         function initFirebaseConnection() {
-            // הנתונים שלך מוטמעים כאן מראש באופן אוטומטי!
             const embeddedConfig = {
                 apiKey: "AIzaSyBIrvkcp-S-sqnaGHEsKbK_HW1Fuccy2jQ",
                 authDomain: "beit-midrash-eec50.firebaseapp.com",
@@ -507,7 +507,10 @@
                 shabbatData, shiurimByDays, customCorners, galleryMainTitle, gallery,
                 donationImg, slideInterval, roshChodeshConfig, halacha: localStorage.getItem('mp_halacha') || ''
             };
-            firebaseDb.ref('board_state').set(fullState);
+            firebaseDb.ref('board_state').set(fullState).catch((err) => {
+                console.error("Firebase sync error:", err);
+                alert("שגיאה בסנכרון לענן. ודא שכללי האבטחה (Security Rules) ב-Firebase מוגדרים לאפשר קריאה וכתיבה.");
+            });
         }
 
         function applyCloudData(data) {
