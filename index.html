@@ -69,16 +69,8 @@
 
         .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; touch-action: pan-y; }
 
-        .nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 48px; height: 48px; background: rgba(17, 24, 39, 0.7);
-            border: 1px solid var(--accent); color: var(--accent); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
-            cursor: pointer; z-index: 20; transition: background 0.2s, transform 0.2s;
-        }
-        .nav-btn:active { background: var(--accent); color: #000; transform: translateY(-50%) scale(0.95); }
-        .nav-btn.prev { right: 12px; }
-        .nav-btn.next { left: 12px; }
+        /* החצים הוסתרו לחלוטין לבקשתך */
+        .nav-btn { display: none !important; }
 
         .slide {
             position: absolute; top: 8px; bottom: 8px; left: 8px; right: 8px;
@@ -125,7 +117,7 @@
         .image-display { width: 100%; height: calc(100% - 35px); object-fit: contain; border-radius: 12px; }
 
         .admin-modal, .password-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000000; display: none; justify-content: center; align-items: center; padding: 20px; }
-        <div class="admin-modal" id="adminModal">
+        .admin-modal.open, .password-modal.open { display: flex; }
         .modal-content { background: #111827; color: #f9fafb; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; border-radius: 16px; padding: 25px; border: 1px solid #374151; }
         .admin-section { background: #030712; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #1f2937; }
         label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
@@ -166,9 +158,6 @@
     </div>
 
     <div class="main-display" id="mainDisplay"></div>
-
-    <div class="nav-btn prev" onclick="prevSlide()" title="שקופית קודמת">➔</div>
-    <div class="nav-btn next" onclick="nextSlide()" title="שקופית הבאה">⬅</div>
 
     <div class="admin-modal" id="adminModal">
         <div class="modal-content">
@@ -456,6 +445,9 @@
         }
 
         function initFirebaseConnection() {
+            // טיפ: אם תרצה שהטלפון והמחשב יתחברו אוטומטית בלי להקליד כל פעם, 
+            // תוכל להדביק את ה-JSON כאן במקום ה-localStorage אם תרצה, 
+            // או פשוט להגדיר פעם אחת בטלפון ובמחשב דרך לוח הבקרה.
             const rawConfig = localStorage.getItem('mp_firebase_config');
             if (!rawConfig) return;
             try {
@@ -817,7 +809,7 @@
         function saveGalleryData() {
             const mainTitleInput = document.getElementById('galleryMainTitleInput');
             if (mainTitleInput) {
-                galleryMainTitle = mainTitleInput.value || 'פעילויות בית המדרש';
+                galleryMainTitle = mainTitleInput.value || 'פעילות בית המדרש';
                 localStorage.setItem('mp_gallery_main_title', galleryMainTitle);
             }
             localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery));
@@ -858,7 +850,7 @@
             document.getElementById('parashaInput').value = shabbatData.parasha || autoDefaults.parasha;
             document.getElementById('haftarahInput').value = shabbatData.haftarah || autoDefaults.haftarah;
             document.getElementById('donationTitleInput').value = sectionTitles.donation || '';
-            document.getElementById('galleryMainTitleInput').value = galleryMainTitle || 'פעילויות בית המדרש';
+            document.getElementById('galleryMainTitleInput').value = galleryMainTitle || 'פעילות בית המדרש';
             document.getElementById('firebaseConfigInput').value = localStorage.getItem('mp_firebase_config') || '';
 
             document.getElementById('rcActiveInput').checked = roshChodeshConfig.active !== false;
