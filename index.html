@@ -32,6 +32,7 @@
             overflow: hidden;
             direction: rtl;
             user-select: none;
+            touch-action: manipulation;
         }
 
         header {
@@ -67,7 +68,7 @@
         .time-progress-container { width: 100%; height: 5px; background: #1f2937; position: relative; z-index: 15; }
         .time-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.05s linear; box-shadow: 0 0 8px var(--accent); }
 
-        .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; touch-action: pan-y; }
+        .main-display { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8px; overflow: hidden; }
 
         /* החצים מוסתרים לחלוטין */
         .nav-btn { display: none !important; }
@@ -124,8 +125,8 @@
         input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; }
         .btn-action { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
         .btn-danger { background: #dc2626; } .btn-success { background: #10b981; } .btn-warning { background: #d97706; } .btn-info { background: #0284c7; }
-        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card { background: #111827; border: 1px solid #374151; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card, .custom-corner-admin-card { background: #111827; border: 1px solid #374151; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header, .custom-corner-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
         .order-admin-item { display: grid; grid-template-columns: 3fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px; background: #111827; padding: 10px; border-radius: 8px; }
         .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -168,9 +169,9 @@
 
             <div class="admin-section" style="background: #064e3b; border: 2px solid #10b981;">
                 <h3 style="color: #34d399; margin-top:0;">🌐 סנכרון בזמן אמת (Firebase Cloud)</h3>
-                <label>הדבק כאן את הגדרות ה-Firebase:</label>
+                <label>הדבק כאן את הגדרות ה-Firebase (אופציונלי):</label>
                 <textarea id="firebaseConfigInput" style="height: 100px; font-family: monospace; font-size: 0.85rem;" placeholder='{"apiKey": "...", "authDomain": "...", "databaseURL": "...", "projectId": "..."}'></textarea>
-                <button class="btn-action btn-success" onclick="saveFirebaseConfig()">חבר ענן וסנכרן כעת</button>
+                <button class="btn-action btn-success" onclick="saveFirebaseConfig()">שמור הגדרות ענן</button>
             </div>
 
             <div class="admin-section">
@@ -249,16 +250,12 @@
             </div>
 
             <div class="admin-section">
-                <h3>📌 פינה מותאמת אישית</h3>
-                <label><input type="checkbox" id="customCornerActive"> הפעל פינה זו</label>
-                <label>כותרת:</label>
-                <input type="text" id="customCornerTitle">
-                <label>טקסט חופשי:</label>
-                <textarea id="customCornerText"></textarea>
-                <label>תמונה (אופציונלי):</label>
-                <input type="file" id="customCornerImgInput" accept="image/*">
-                <div id="customCornerPreview" style="margin-top: 10px;"></div>
-                <button class="btn-action" onclick="saveCustomCorner()">שמור פינה אישית</button>
+                <h3>📌 פינות מותאמות אישית נוספות (חדש!)</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem; margin-top: 0;">כאן תוכל להוסיף כמה פינות או מודעות שתרצה, לכתוב טקסט ולהוסיף תמונה:</p>
+                <div id="customCornersContainer"></div>
+                <button class="btn-action btn-success" onclick="addCustomCornerBox()" style="margin-top: 10px;">+ הוסף פינה חדשה</button>
+                <br><br>
+                <button class="btn-action" onclick="saveCustomCornersData()">שמור פינות מותאמות</button>
             </div>
 
             <div class="admin-section">
@@ -364,7 +361,9 @@
         let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4 };
         let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
         let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
-        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorner', 'donation', 'halacha', 'gallery'];
+        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorners', 'donation', 'halacha', 'gallery'];
+        
+        if (!sectionOrder.includes('customCorners')) { sectionOrder.push('customCorners'); }
 
         let roshChodeshConfig = JSON.parse(localStorage.getItem('mp_rc_config')) || { active: true, title: 'הודעה מיוחדת לשבוע זה', cardTitle: '🌙 ראש חודש קרוב', customText: '' };
 
@@ -384,7 +383,7 @@
 
         let upcomingRoshChodeshText = '';
         let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3')) || [];
-        let customCorner = JSON.parse(localStorage.getItem('mp_custom_corner')) || { active: false, title: '', text: '', src: '' };
+        let customCorners = JSON.parse(localStorage.getItem('mp_custom_corners_v2')) || [];
         
         let galleryMainTitle = localStorage.getItem('mp_gallery_main_title') || 'פעילויות בית המדרש';
         let gallery = JSON.parse(localStorage.getItem('mp_gallery_v2')) || [];
@@ -399,7 +398,7 @@
         let firebaseDb = null;
 
         const orderedDays = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
-        const sectionNames = { shiurim: '📖 שיעורים מרכזיים', weekday: '🕐 זמני תפילות ימי חול', shabbat: '🕯️ זמני שבת קודש', customCorner: '📌 פינה מותאמת אישית', donation: '💳 תרומות לאחזקת בית המדרש', halacha: '📜 הלכה יומית', gallery: '🖼️ גלריית פעילויות' };
+        const sectionNames = { shiurim: '📖 שיעורים מרכזיים', weekday: '🕐 זמני תפילות ימי חול', shabbat: '🕯️ זמני שבת קודש', customCorners: '📌 פינות מותאמות אישית', donation: '💳 תרומות לאחזקת בית המדרש', halacha: '📜 הלכה יומית', gallery: '🖼️ גלריית פעילויות' };
 
         window.onload = function() {
             try {
@@ -429,7 +428,6 @@
             } catch (e) { buildSlides(); startRotation(); }
         };
 
-        /* מנגנון מגע משופר למובייל (החלקה וגם עצירה בלחיצה) */
         function initTouchSwipeEvents() {
             let touchStartX = 0;
             let touchEndX = 0;
@@ -450,13 +448,11 @@
                 const diffX = touchEndX - touchStartX;
                 const diffY = touchEndY - touchStartY;
                 
-                // אם זו החלקה אופקית (Swipe)
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     const threshold = 40;
                     if (diffX < -threshold) { nextSlide(); }
                     else if (diffX > threshold) { prevSlide(); }
                 } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
-                    // לחיצה קצרה (Tap) - עוצרת או משחררת את התחלופה לקריאה נוחה
                     isPaused = !isPaused;
                     startRotation();
                 }
@@ -464,18 +460,18 @@
         }
 
         function initFirebaseConnection() {
-            // טיפ: ניתן להכניס כאן את הגדרות ה-Firebase שלך ישירות כדי שכל מכשיר יתחבר אוטומטית מיד!
+            // הנתונים שלך מוטמעים כאן מראש באופן אוטומטי!
             const embeddedConfig = {
-                apiKey: "",
-                authDomain: "",
-                databaseURL: "",
-                projectId: "",
-                storageBucket: "",
-                messagingSenderId: "",
-                appId: ""
+                apiKey: "AIzaSyBIrvkcp-S-sqnaGHEsKbK_HW1Fuccy2jQ",
+                authDomain: "beit-midrash-eec50.firebaseapp.com",
+                databaseURL: "https://beit-midrash-eec50-default-rtdb.firebaseio.com",
+                projectId: "beit-midrash-eec50",
+                storageBucket: "beit-midrash-eec50.firebasestorage.app",
+                messagingSenderId: "914937182417",
+                appId: "1:914937182417:web:024392a1cbbc9f67b76df0"
             };
 
-            const rawConfig = localStorage.getItem('mp_firebase_config') || (embeddedConfig.databaseURL ? JSON.stringify(embeddedConfig) : null);
+            const rawConfig = localStorage.getItem('mp_firebase_config') || JSON.stringify(embeddedConfig);
             if (!rawConfig) return;
             try {
                 const config = JSON.parse(rawConfig);
@@ -495,8 +491,10 @@
         function saveFirebaseConfig() {
             const txt = document.getElementById('firebaseConfigInput').value;
             try {
-                JSON.parse(txt);
-                localStorage.setItem('mp_firebase_config', txt);
+                if (txt.trim()) {
+                    JSON.parse(txt);
+                    localStorage.setItem('mp_firebase_config', txt);
+                }
                 alert('הגדרות Firebase נשמרו!');
                 location.reload();
             } catch (e) { alert('שגיאה: קוד ה-JSON אינו תקין'); }
@@ -506,7 +504,7 @@
             if (!firebaseDb) return;
             const fullState = {
                 headerConfig, halachaConfig, sectionTitles, sectionOrder, weekdayTimes,
-                shabbatData, shiurimByDays, customCorner, galleryMainTitle, gallery,
+                shabbatData, shiurimByDays, customCorners, galleryMainTitle, gallery,
                 donationImg, slideInterval, roshChodeshConfig, halacha: localStorage.getItem('mp_halacha') || ''
             };
             firebaseDb.ref('board_state').set(fullState);
@@ -520,7 +518,7 @@
             if (data.weekdayTimes) weekdayTimes = data.weekdayTimes;
             if (data.shabbatData) shabbatData = data.shabbatData;
             if (data.shiurimByDays) shiurimByDays = data.shiurimByDays;
-            if (data.customCorner) customCorner = data.customCorner;
+            if (data.customCorners) customCorners = data.customCorners;
             if (data.galleryMainTitle) galleryMainTitle = data.galleryMainTitle;
             if (data.gallery) gallery = data.gallery;
             if (data.donationImg) donationImg = data.donationImg;
@@ -625,14 +623,18 @@
                     });
                 }
 
-                if (secKey === 'customCorner' && customCorner.active) {
-                    const cornerSlide = document.createElement('div'); cornerSlide.className = 'slide';
-                    cornerSlide.innerHTML = `
-                        <div class="slide-title" style="${slideTitleStyle}">${customCorner.title || 'פינה מותאמת אישית'}</div>
-                        ${customCorner.text ? `<div class="custom-box">${customCorner.text}</div>` : ''}
-                        ${customCorner.src ? `<img src="${customCorner.src}" class="image-display" style="margin-top:10px;">` : ''}
-                    `;
-                    display.appendChild(cornerSlide); slides.push(cornerSlide);
+                if (secKey === 'customCorners') {
+                    customCorners.forEach(corner => {
+                        if (corner.active !== false) {
+                            const cornerSlide = document.createElement('div'); cornerSlide.className = 'slide';
+                            cornerSlide.innerHTML = `
+                                <div class="slide-title" style="${slideTitleStyle}">${corner.title || 'פינה מותאמת אישית'}</div>
+                                ${corner.text ? `<div class="custom-box">${corner.text}</div>` : ''}
+                                ${corner.src ? `<img src="${corner.src}" class="image-display" style="margin-top:10px;">` : ''}
+                            `;
+                            display.appendChild(cornerSlide); slides.push(cornerSlide);
+                        }
+                    });
                 }
 
                 if (secKey === 'donation' && donationImg) {
@@ -810,6 +812,46 @@
         function addNewShiurBox() { shiurimByDays.push({ day: 'יום ראשון', time: '', location: '', src: '' }); renderShiurimAdminItems(); }
         function saveShiurimData() { localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
 
+        function renderCustomCornersAdmin() {
+            const container = document.getElementById('customCornersContainer'); if(!container) return;
+            if (customCorners.length === 0) { container.innerHTML = '<div style="color:#9ca3af; padding:5px;">אין פינות מותאמות אישית כרגע.</div>'; return; }
+            container.innerHTML = customCorners.map((corner, idx) => `
+                <div class="custom-corner-admin-card">
+                    <div class="custom-corner-admin-card-header">
+                        <strong>פינה #${idx+1}</strong>
+                        <button class="btn-action btn-danger" onclick="customCorners.splice(${idx},1);renderCustomCornersAdmin();">מחק פינה</button>
+                    </div>
+                    <label><input type="checkbox" ${corner.active !== false ? 'checked' : ''} onchange="customCorners[${idx}].active=this.checked"> הצג פינה זו בסיבוב השקופיות</label>
+                    <label>כותרת הפינה:</label>
+                    <input type="text" value="${corner.title || ''}" placeholder="כותרת הפינה" onchange="customCorners[${idx}].title=this.value">
+                    <label>טקסט חופשי:</label>
+                    <textarea placeholder="תוכן הפינה..." onchange="customCorners[${idx}].text=this.value">${corner.text || ''}</textarea>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="file" accept="image/*" id="customCornerFile_${idx}" style="display:none;" onchange="handleCustomCornerImage(this, ${idx})">
+                        <button class="btn-action btn-info" onclick="document.getElementById('customCornerFile_${idx}').click()">📁 בחר תמונה</button>
+                        <span style="font-size: 0.85rem; color: #34d399;">${corner.src ? '✔️ תמונה קיימת' : 'אין תמונה'}</span>
+                    </div>
+                    ${corner.src ? `<img src="${corner.src}" style="max-height: 70px; border-radius: 6px; object-fit: contain; margin-top: 5px;">` : ''}
+                </div>
+            `).join('');
+        }
+
+        function handleCustomCornerImage(input, idx) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader(); reader.onload = e => { customCorners[idx].src = e.target.result; renderCustomCornersAdmin(); }; reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function addCustomCornerBox() {
+            customCorners.push({ active: true, title: 'פינה חדשה', text: '', src: '' });
+            renderCustomCornersAdmin();
+        }
+
+        function saveCustomCornersData() {
+            localStorage.setItem('mp_custom_corners_v2', JSON.stringify(customCorners));
+            syncAllDataToCloud(); alert('הפינות המותאמות נשמרו בהצלחה!'); buildSlides();
+        }
+
         function renderGalleryAdminItems() {
             const container = document.getElementById('galleryAdminList'); if(!container) return;
             if (gallery.length === 0) { container.innerHTML = '<div style="color:#9ca3af; padding:10px;">אין תמונות בגלריה.</div>'; return; }
@@ -843,20 +885,6 @@
             syncAllDataToCloud(); alert('הגלריה והכותרת נשמרו בהצלחה!'); buildSlides();
         }
 
-        function saveCustomCorner() {
-            customCorner.active = document.getElementById('customCornerActive').checked;
-            customCorner.title = document.getElementById('customCornerTitle').value;
-            customCorner.text = document.getElementById('customCornerText').value;
-            const fileInput = document.getElementById('customCornerImgInput');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader(); reader.onload = function(evt) {
-                    customCorner.src = evt.target.result; localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner));
-                    syncAllDataToCloud(); alert('נשמר!'); renderAdminData(); buildSlides();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else { localStorage.setItem('mp_custom_corner', JSON.stringify(customCorner)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
-        }
-
         function saveDonationData() {
             sectionTitles.donation = document.getElementById('donationTitleInput').value || sectionTitles.donation;
             localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
@@ -885,18 +913,19 @@
             document.getElementById('rcCardTitleInput').value = roshChodeshConfig.cardTitle || '';
             document.getElementById('rcCustomTextInput').value = roshChodeshConfig.customText || '';
 
-            renderSectionOrderAdmin(); renderWeekdayAdminItems(); renderShabbatAdminItems(); renderShiurimAdminItems(); renderGalleryAdminItems();
+            renderSectionOrderAdmin(); 
+            renderWeekdayAdminItems(); 
+            renderShabbatAdminItems(); 
+            renderShiurimAdminItems(); 
+            renderCustomCornersAdmin();
+            renderGalleryAdminItems();
 
-            document.getElementById('customCornerActive').checked = customCorner.active;
-            document.getElementById('customCornerTitle').value = customCorner.title || '';
-            document.getElementById('customCornerText').value = customCorner.text || '';
-            document.getElementById('customCornerPreview').innerHTML = customCorner.src ? `<img src="${customCorner.src}" style="max-height: 80px; border-radius: 6px;">` : '';
             document.getElementById('donationPreview').innerHTML = donationImg ? `<img src="${donationImg}" style="max-height: 100px; border-radius: 6px;">` : 'טרם הועלתה תמונה';
         }
 
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corner', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
 
