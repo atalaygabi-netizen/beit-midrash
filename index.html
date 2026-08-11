@@ -81,7 +81,7 @@
         }
 
         .slide.active { opacity: 1; visibility: visible; }
-        .slide-title { font-weight: bold; color: var(--accent); margin-bottom: 8px; border-bottom: 2px solid var(--accent); padding-bottom: 4px; width: 100%; text-align: center; flex-shrink: 0; }
+        .slide-title { font-weight: bold; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 4px; width: 100%; flex-shrink: 0; }
 
         .rosh-chodesh-card {
             background: linear-gradient(145deg, #0f172a, #1e3a8a); border: 3px solid #38bdf8;
@@ -127,11 +127,12 @@
         input[type="text"], input[type="number"], input[type="password"], input[type="color"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; margin-bottom: 10px; font-size: 1rem; touch-action: manipulation; }
         .btn-action { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; touch-action: manipulation; }
         .btn-danger { background: #dc2626; } .btn-success { background: #10b981; } .btn-warning { background: #d97706; } .btn-info { background: #0284c7; }
-        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card, .custom-corner-admin-card { background: #111827; border: 1px solid #374151; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
-        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header, .custom-corner-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .shiur-admin-card, .gallery-admin-card, .time-box-admin-card, .custom-corner-admin-card, .slide-title-admin-card { background: #111827; border: 1px solid #374151; padding: 12px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .shiur-admin-card-header, .gallery-admin-card-header, .time-box-admin-card-header, .custom-corner-admin-card-header, .slide-title-admin-card-header { display: flex; justify-content: space-between; align-items: center; }
         .order-admin-item { display: grid; grid-template-columns: 3fr auto auto; gap: 10px; align-items: center; margin-bottom: 10px; background: #111827; padding: 10px; border-radius: 8px; }
         .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-4col { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
     </style>
 </head>
 <body>
@@ -164,10 +165,13 @@
 
     <div class="admin-modal" id="adminModal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0;">לוח בקרה וניהול מערכת</h2>
                 <button class="btn-action btn-danger" onclick="closeAdminModal()">סגור ✕</button>
             </div>
+
+            <!-- Master Save Button -->
+            <button class="btn-action btn-success" style="width: 100%; font-size: 1.1rem; padding: 14px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);" onclick="saveAllSystemData()">💾 שמור את כל השינויים במערכת (שמירה ראשית)</button>
 
             <div class="admin-section" style="background: #1e1b4b; border: 2px solid #6366f1;">
                 <h3 style="color: #818cf8; margin-top:0;">💾 גיבוי ושחזור נתוני המערכת</h3>
@@ -184,6 +188,13 @@
                 <label>הדבק כאן את הגדרות ה-Firebase (אופציונלי):</label>
                 <textarea id="firebaseConfigInput" style="height: 100px; font-family: monospace; font-size: 0.85rem;" placeholder='{"apiKey": "...", "authDomain": "...", "databaseURL": "...", "projectId": "..."}'></textarea>
                 <button class="btn-action btn-success" onclick="saveFirebaseConfig()">שמור הגדרות ענן</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>🎨 עריכה פרטנית לכותרות השקופיות (מיקום, גודל וטקסט לכל שקופית)</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem; margin-top: 0;">כאן תוכל לשנות בנפרד לכל שקופית את הכותרת שלה, גודל הכתב, היישור האופקי והמיקום האנכי:</p>
+                <div id="slideTitlesAdminContainer"></div>
+                <button class="btn-action" onclick="saveSlideTitlesConfig()" style="margin-top: 10px;">שמור הגדרות כותרות שקופיות</button>
             </div>
 
             <div class="admin-section">
@@ -283,18 +294,14 @@
             </div>
 
             <div class="admin-section">
-                <h3>⚙️ הגדרות תצוגה וכותרות שקופיות</h3>
+                <h3>⚙️ הגדרות כותרת ראשית של האתר</h3>
                 <label>כותרת ראשית (של האתר):</label><input type="text" id="headerTitleInput">
                 <label>כותרת משנה:</label><input type="text" id="headerSubtitleInput">
                 <div class="grid-2col">
                     <div><label>יישור כותרת ראשית:</label><select id="headerAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
                     <div><label>גודל כותרת ראשית (rem):</label><input type="number" id="headerFontSizeInput" step="0.1" value="1.6"></div>
                 </div>
-                <div class="grid-2col" style="margin-top: 10px;">
-                    <div><label>גודל כותרות השקופיות (rem):</label><input type="number" id="slideFontSizeInput" step="0.1" value="1.3"></div>
-                    <div><label>יישור כותרות השקופיות:</label><select id="slideAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
-                </div>
-                <button class="btn-action" onclick="saveHeaderStyles()" style="margin-top:10px;">שמור הגדרות כותרת</button>
+                <button class="btn-action" onclick="saveHeaderStyles()" style="margin-top:10px;">שמור כותרת אתר</button>
                 <hr style="border-color:#374151; margin: 15px 0;">
                 <label for="slideIntervalInput">זמן הצגת שקופית (בשניות):</label>
                 <input type="number" id="slideIntervalInput" min="2" max="120" value="8">
@@ -419,11 +426,23 @@
             return autoHalachot[dayOfYear % autoHalachot.length];
         }
 
-        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.3 };
+        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6 };
         let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
-        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
-        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorners', 'donation', 'halacha', 'gallery'];
         
+        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
+        
+        // Per-slide title custom configurations
+        let slideTitleConfigs = JSON.parse(localStorage.getItem('mp_slide_title_configs')) || {
+            weekday: { title: 'זמני תפילות ימי חול', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            shabbat: { title: 'זמני שבת קודש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            shiurim: { title: 'שיעורים מרכזיים בבית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            customCorners: { title: 'פינה מותאמת אישית', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            donation: { title: 'לתרומות לאחזקת בית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            halacha: { title: 'הלכה יומית', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
+            gallery: { title: 'פעילויות בית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 }
+        };
+
+        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorners', 'donation', 'halacha', 'gallery'];
         if (!sectionOrder.includes('customCorners')) { sectionOrder.push('customCorners'); }
 
         let roshChodeshConfig = JSON.parse(localStorage.getItem('mp_rc_config')) || { active: true, title: 'הודעה מיוחדת לשבוע זה', cardTitle: '🌙 ראש חודש קרוב', customText: '' };
@@ -579,7 +598,7 @@
         function syncAllDataToCloud() {
             if (!firebaseDb) return;
             const fullState = {
-                headerConfig, halachaConfig, sectionTitles, sectionOrder, weekdayTimes,
+                headerConfig, halachaConfig, sectionTitles, slideTitleConfigs, sectionOrder, weekdayTimes,
                 shabbatData, shiurimByDays, customCorners, galleryMainTitle, gallery,
                 donationImg, slideInterval, roshChodeshConfig, halacha: localStorage.getItem('mp_halacha') || ''
             };
@@ -593,6 +612,7 @@
             if (data.headerConfig) headerConfig = data.headerConfig;
             if (data.halachaConfig) halachaConfig = data.halachaConfig;
             if (data.sectionTitles) sectionTitles = data.sectionTitles;
+            if (data.slideTitleConfigs) slideTitleConfigs = data.slideTitleConfigs;
             if (data.sectionOrder) sectionOrder = data.sectionOrder;
             if (data.weekdayTimes) weekdayTimes = data.weekdayTimes;
             if (data.shabbatData) shabbatData = data.shabbatData;
@@ -606,6 +626,28 @@
             if (data.halacha !== undefined) localStorage.setItem('mp_halacha', data.halacha);
 
             applyHeaderStyles(); buildSlides();
+        }
+
+        function saveAllSystemData() {
+            // Save all current sections from local state/inputs
+            localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
+            localStorage.setItem('mp_halacha_config', JSON.stringify(halachaConfig));
+            localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
+            localStorage.setItem('mp_slide_title_configs', JSON.stringify(slideTitleConfigs));
+            localStorage.setItem('mp_section_order', JSON.stringify(sectionOrder));
+            localStorage.setItem('mp_weekday_times_v4', JSON.stringify(weekdayTimes));
+            localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
+            localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays));
+            localStorage.setItem('mp_custom_corners_v2', JSON.stringify(customCorners));
+            localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery));
+            localStorage.setItem('mp_gallery_main_title', galleryMainTitle);
+            localStorage.setItem('mp_donation_img', donationImg);
+            localStorage.setItem('mp_interval', slideInterval);
+            localStorage.setItem('mp_rc_config', JSON.stringify(roshChodeshConfig));
+
+            syncAllDataToCloud();
+            alert('כל שינויי המערכת נשמרו בהצלחה והועלו לענן!');
+            buildSlides();
         }
 
         function calculateInternalHebrewCalendar() {
@@ -652,11 +694,28 @@
             `;
         }
 
+        function getSlideTitleConfig(secKey) {
+            if (!slideTitleConfigs[secKey]) {
+                slideTitleConfigs[secKey] = { title: sectionNames[secKey] || secKey, fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 };
+            }
+            return slideTitleConfigs[secKey];
+        }
+
+        function createSlideHtml(secKey, fallbackTitle, contentHtml) {
+            const cfg = getSlideTitleConfig(secKey);
+            const titleText = cfg.title || fallbackTitle;
+            const marginB = cfg.margin !== undefined ? cfg.margin : 8;
+            const isBottom = cfg.verticalPos === 'bottom';
+            const slideTitleStyle = `text-align: ${cfg.align || 'center'}; font-size: ${cfg.fontSize || 1.3}rem; margin-bottom: ${isBottom ? '0' : marginB}px; margin-top: ${isBottom ? marginB + 'px' : '0'};`;
+            const titleHtml = `<div class="slide-title" style="${slideTitleStyle}">${titleText}</div>`;
+            
+            return isBottom ? `${contentHtml}${titleHtml}` : `${titleHtml}${contentHtml}`;
+        }
+
         function buildSlides() {
             const display = document.getElementById('mainDisplay');
             if(!display) return;
             display.innerHTML = ''; slides = [];
-            const slideTitleStyle = `text-align: ${headerConfig.slideAlign || 'center'}; font-size: ${headerConfig.slideFontSize || 1.3}rem;`;
             const effParasha = shabbatData.parasha || autoDefaults.parasha;
             const effHaftarah = shabbatData.haftarah || autoDefaults.haftarah;
 
@@ -665,41 +724,43 @@
                     const rcTextToShow = roshChodeshConfig.customText || (upcomingRoshChodeshText ? `שבוע טוב! בשבוע זה יחול <strong>${upcomingRoshChodeshText}</strong>` : '');
                     if (rcTextToShow && roshChodeshConfig.active !== false) {
                         const rcSlide = document.createElement('div'); rcSlide.className = 'slide';
-                        rcSlide.innerHTML = `
-                            <div class="slide-title" style="${slideTitleStyle}">${roshChodeshConfig.title || 'הודעה מיוחדת לשבוע זה'}</div>
+                        const rcContent = `
                             <div class="rosh-chodesh-card">
                                 <h2>${roshChodeshConfig.cardTitle || '🌙 ראש חודש קרוב'}</h2>
                                 <p>${rcTextToShow}</p>
                             </div>
                         `;
+                        // Using weekday slide config or default for rosh chodesh
+                        rcSlide.innerHTML = createSlideHtml('weekday', roshChodeshConfig.title || 'הודעה מיוחדת לשבוע זה', rcContent);
                         display.appendChild(rcSlide); slides.push(rcSlide);
                     }
                     const timesSlide = document.createElement('div'); timesSlide.className = 'slide';
-                    timesSlide.innerHTML = `<div class="slide-title" style="${slideTitleStyle}">${sectionTitles.weekday}</div><div class="times-grid">${weekdayTimes.map(item => createTimeBoxHtml(item)).join('')}</div>`;
+                    const timesContent = `<div class="times-grid">${weekdayTimes.map(item => createTimeBoxHtml(item)).join('')}</div>`;
+                    timesSlide.innerHTML = createSlideHtml('weekday', sectionTitles.weekday, timesContent);
                     display.appendChild(timesSlide); slides.push(timesSlide);
                 }
 
                 if (secKey === 'shabbat') {
                     const shabbatSlide = document.createElement('div'); shabbatSlide.className = 'slide';
-                    shabbatSlide.innerHTML = `
-                        <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shabbat} - ${effParasha}</div>
+                    const shabbatContent = `
                         <div class="shabbat-container">
                             <div class="haftarah-info-bar-top">📖 הפטרה: ${effHaftarah}</div>
                             <div class="shabbat-section-title">🕯️ יום שישי</div><div class="shabbat-grid">${(shabbatData.fridayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                             <div class="shabbat-section-title">☀️ יום שבת</div><div class="shabbat-grid">${(shabbatData.saturdayItems || []).map(i => createTimeBoxHtml(i)).join('')}</div>
                         </div>
                     `;
+                    shabbatSlide.innerHTML = createSlideHtml('shabbat', `${sectionTitles.shabbat} - ${effParasha}`, shabbatContent);
                     display.appendChild(shabbatSlide); slides.push(shabbatSlide);
                 }
 
                 if (secKey === 'shiurim') {
                     shiurimByDays.forEach(s => {
                         const shiurSlide = document.createElement('div'); shiurSlide.className = 'slide';
-                        shiurSlide.innerHTML = `
-                            <div class="slide-title" style="${slideTitleStyle}">${sectionTitles.shiurim}</div>
+                        const shiurContent = `
                             <div class="shiur-info-bar"><div>📅 <span>${s.day}</span></div><div>🕒 <span>${s.time}</span></div><div>📍 <span>${s.location}</span></div></div>
                             ${s.src ? `<img src="${s.src}" class="image-display">` : '<div style="color:var(--text-muted); margin-top:20px; font-size:1.3rem;">אין תמונה מוגדרת</div>'}
                         `;
+                        shiurSlide.innerHTML = createSlideHtml('shiurim', sectionTitles.shiurim, shiurContent);
                         display.appendChild(shiurSlide); slides.push(shiurSlide);
                     });
                 }
@@ -708,11 +769,11 @@
                     customCorners.forEach(corner => {
                         if (corner.active !== false) {
                             const cornerSlide = document.createElement('div'); cornerSlide.className = 'slide';
-                            cornerSlide.innerHTML = `
-                                <div class="slide-title" style="${slideTitleStyle}">${corner.title || 'פינה מותאמת אישית'}</div>
+                            const cornerContent = `
                                 ${corner.text ? `<div class="custom-box">${corner.text}</div>` : ''}
                                 ${corner.src ? `<img src="${corner.src}" class="image-display" style="margin-top:6px;">` : ''}
                             `;
+                            cornerSlide.innerHTML = createSlideHtml('customCorners', corner.title || 'פינה מותאמת אישית', cornerContent);
                             display.appendChild(cornerSlide); slides.push(cornerSlide);
                         }
                     });
@@ -720,21 +781,24 @@
 
                 if (secKey === 'donation' && donationImg) {
                     const donSlide = document.createElement('div'); donSlide.className = 'slide';
-                    donSlide.innerHTML = `<div class="slide-title" style="${slideTitleStyle}">${sectionTitles.donation}</div><img src="${donationImg}" class="image-display">`;
+                    const donContent = `<img src="${donationImg}" class="image-display">`;
+                    donSlide.innerHTML = createSlideHtml('donation', sectionTitles.donation, donContent);
                     display.appendChild(donSlide); slides.push(donSlide);
                 }
 
                 if (secKey === 'halacha') {
                     const halachaSlide = document.createElement('div'); halachaSlide.className = 'slide';
                     const hStyle = `font-size: ${halachaConfig.fontSize || 2}rem; color: ${halachaConfig.color || '#f9fafb'}; font-style: ${halachaConfig.style || 'normal'};`;
-                    halachaSlide.innerHTML = `<div class="slide-title" style="${slideTitleStyle}">${sectionTitles.halacha}</div><div class="halacha-box" style="${hStyle}">${getDailyHalacha()}</div>`;
+                    const halachaContent = `<div class="halacha-box" style="${hStyle}">${getDailyHalacha()}</div>`;
+                    halachaSlide.innerHTML = createSlideHtml('halacha', sectionTitles.halacha, halachaContent);
                     display.appendChild(halachaSlide); slides.push(halachaSlide);
                 }
 
                 if (secKey === 'gallery') {
                     gallery.forEach(item => {
                         const galSlide = document.createElement('div'); galSlide.className = 'slide';
-                        galSlide.innerHTML = `<div class="slide-title" style="${slideTitleStyle}">${galleryMainTitle}</div><img src="${item.src}" class="image-display">`;
+                        const galContent = `<img src="${item.src}" class="image-display">`;
+                        galSlide.innerHTML = createSlideHtml('gallery', galleryMainTitle, galContent);
                         display.appendChild(galSlide); slides.push(galSlide);
                     });
                 }
@@ -784,10 +848,47 @@
             headerConfig.subtitle = document.getElementById('headerSubtitleInput').value;
             headerConfig.align = document.getElementById('headerAlignInput').value;
             headerConfig.fontSize = parseFloat(document.getElementById('headerFontSizeInput').value) || 1.6;
-            headerConfig.slideFontSize = parseFloat(document.getElementById('slideFontSizeInput').value) || 1.3;
-            headerConfig.slideAlign = document.getElementById('slideAlignInput').value;
             localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
-            syncAllDataToCloud(); alert('נשמר!'); applyHeaderStyles(); buildSlides();
+            syncAllDataToCloud(); alert('כותרת האתר נשמרה!'); applyHeaderStyles(); buildSlides();
+        }
+
+        function renderSlideTitlesAdmin() {
+            const container = document.getElementById('slideTitlesAdminContainer');
+            if (!container) return;
+            const keys = ['weekday', 'shabbat', 'shiurim', 'customCorners', 'donation', 'halacha', 'gallery'];
+            container.innerHTML = keys.map(k => {
+                const cfg = getSlideTitleConfig(k);
+                return `
+                    <div class="slide-title-admin-card" data-key="${k}">
+                        <div class="slide-title-admin-card-header"><strong>שקופית: ${sectionNames[k] || k}</strong></div>
+                        <label>כותרת השקופית:</label>
+                        <input type="text" class="st-title" value="${cfg.title || ''}" placeholder="כותרת">
+                        <div class="grid-4col">
+                            <div><label>גודל (rem):</label><input type="number" step="0.1" class="st-fontsize" value="${cfg.fontSize || 1.3}"></div>
+                            <div><label>יישור:</label><select class="st-align"><option value="center" ${cfg.align==='center'?'selected':''}>מרכז</option><option value="right" ${cfg.align==='right'?'selected':''}>ימין</option><option value="left" ${cfg.align==='left'?'selected':''}>שמאל</option></select></div>
+                            <div><label>מיקום אנכי:</label><select class="st-vertical"><option value="top" ${cfg.verticalPos==='top'?'selected':''}>למעלה</option><option value="bottom" ${cfg.verticalPos==='bottom'?'selected':''}>למטה</option></select></div>
+                            <div><label>מרווח (px):</label><input type="number" class="st-margin" value="${cfg.margin !== undefined ? cfg.margin : 8}"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function saveSlideTitlesConfig() {
+            const cards = document.querySelectorAll('.slide-title-admin-card');
+            cards.forEach(card => {
+                const k = card.getAttribute('data-key');
+                if (!slideTitleConfigs[k]) slideTitleConfigs[k] = {};
+                slideTitleConfigs[k].title = card.querySelector('.st-title').value;
+                slideTitleConfigs[k].fontSize = parseFloat(card.querySelector('.st-fontsize').value) || 1.3;
+                slideTitleConfigs[k].align = card.querySelector('.st-align').value;
+                slideTitleConfigs[k].verticalPos = card.querySelector('.st-vertical').value;
+                slideTitleConfigs[k].margin = parseInt(card.querySelector('.st-margin').value) || 8;
+            });
+            localStorage.setItem('mp_slide_title_configs', JSON.stringify(slideTitleConfigs));
+            syncAllDataToCloud();
+            alert('הגדרות כותרות השקופיות נשמרו בהצלחה!');
+            buildSlides();
         }
 
         function saveHalachaData() {
@@ -845,7 +946,7 @@
         }
 
         function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00', fontSize: 1.6, isAutoSunset: false, sunsetOffset: -20 }); renderWeekdayAdminItems(); }
-        function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v4', JSON.stringify(weekdayTimes)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
+        function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v4', JSON.stringify(weekdayTimes)); syncAllDataToCloud(); alert('זמני חול נשמרו!'); buildSlides(); }
 
         function renderShabbatAdminItems() {
             const friElem = document.getElementById('fridayItemsContainer');
@@ -912,7 +1013,7 @@
         }
 
         function addNewShiurBox() { shiurimByDays.push({ day: 'יום ראשון', time: '', location: '', src: '' }); renderShiurimAdminItems(); }
-        function saveShiurimData() { localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
+        function saveShiurimData() { localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays)); syncAllDataToCloud(); alert('שיעורים נשמרו!'); buildSlides(); }
 
         function renderCustomCornersAdmin() {
             const container = document.getElementById('customCornersContainer'); if(!container) return;
@@ -990,11 +1091,11 @@
         function saveDonationData() {
             sectionTitles.donation = document.getElementById('donationTitleInput').value || sectionTitles.donation;
             localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
-            syncAllDataToCloud(); alert('נשמר!'); buildSlides();
+            syncAllDataToCloud(); alert('תרומות נשמרו!'); buildSlides();
         }
 
         function generateSystemBackup() {
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
             document.getElementById('systemBackupInput').value = JSON.stringify(storageData, null, 2);
@@ -1021,8 +1122,8 @@
             document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
             document.getElementById('headerFontSizeInput').value = headerConfig.fontSize || 1.6;
-            document.getElementById('slideFontSizeInput').value = headerConfig.slideFontSize || 1.3;
-            document.getElementById('slideAlignInput').value = headerConfig.slideAlign || 'center';
+
+            renderSlideTitlesAdmin();
 
             document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 2.3;
             document.getElementById('halachaTextColorInput').value = halachaConfig.color || '#f9fafb';
@@ -1054,7 +1155,7 @@
 
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
 
