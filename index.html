@@ -179,9 +179,9 @@
             <div class="admin-section" style="background: #1e1b4b; border: 2px solid #6366f1;">
                 <h3 style="color: #818cf8; margin-top:0;">💾 גיבוי ושחזור נתוני המערכת</h3>
                 <label>נתוני הקוד וההגדרות הנוכחיים:</label>
-                <textarea id="systemBackupInput" style="height: 90px; font-family: monospace; font-size: 0.85rem;" placeholder="לחץ על 'צור גיבוי' כדי לראות את כל נתוני המערכת כאן..."></textarea>
+                <textarea id="systemBackupInput" style="height: 90px; font-family: monospace; font-size: 0.85rem;" placeholder="הנתונים יופיעו כאן באופן אוטומטי..."></textarea>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button class="btn-action btn-info" onclick="generateSystemBackup()">📦 צור גיבוי לתיבה</button>
+                    <button class="btn-action btn-info" onclick="generateSystemBackup()">📦 רענן גיבוי בתיבה</button>
                     <button class="btn-action btn-success" onclick="restoreSystemBackup()">🔄 טען ושחזר מהתיבה</button>
                 </div>
             </div>
@@ -630,6 +630,74 @@
         }
 
         function saveAllSystemData() {
+            // 1. Collect from Header Inputs
+            const hTitle = document.getElementById('headerTitleInput');
+            const hSub = document.getElementById('headerSubtitleInput');
+            const hAlign = document.getElementById('headerAlignInput');
+            const hFont = document.getElementById('headerFontSizeInput');
+            if(hTitle) headerConfig.title = hTitle.value;
+            if(hSub) headerConfig.subtitle = hSub.value;
+            if(hAlign) headerConfig.align = hAlign.value;
+            if(hFont) headerConfig.fontSize = parseFloat(hFont.value) || 1.6;
+
+            // 2. Collect from Slide Titles Inputs
+            const cards = document.querySelectorAll('.slide-title-admin-card');
+            cards.forEach(card => {
+                const k = card.getAttribute('data-key');
+                if (!slideTitleConfigs[k]) slideTitleConfigs[k] = {};
+                const stTitle = card.querySelector('.st-title');
+                const stSize = card.querySelector('.st-fontsize');
+                const stAlign = card.querySelector('.st-align');
+                const stVert = card.querySelector('.st-vertical');
+                const stMargin = card.querySelector('.st-margin');
+                if(stTitle) slideTitleConfigs[k].title = stTitle.value;
+                if(stSize) slideTitleConfigs[k].fontSize = parseFloat(stSize.value) || 1.3;
+                if(stAlign) slideTitleConfigs[k].align = stAlign.value;
+                if(stVert) slideTitleConfigs[k].verticalPos = stVert.value;
+                if(stMargin) slideTitleConfigs[k].margin = parseInt(stMargin.value) || 8;
+            });
+
+            // 3. Collect Rosh Chodesh
+            const rcActive = document.getElementById('rcActiveInput');
+            const rcTitle = document.getElementById('rcTitleInput');
+            const rcCardTitle = document.getElementById('rcCardTitleInput');
+            const rcCustomText = document.getElementById('rcCustomTextInput');
+            if(rcActive) roshChodeshConfig.active = rcActive.checked;
+            if(rcTitle) roshChodeshConfig.title = rcTitle.value;
+            if(rcCardTitle) roshChodeshConfig.cardTitle = rcCardTitle.value;
+            if(rcCustomText) roshChodeshConfig.customText = rcCustomText.value;
+
+            // 4. Collect Shabbat
+            const parashaElem = document.getElementById('parashaInput');
+            const haftarahElem = document.getElementById('haftarahInput');
+            if(parashaElem && parashaElem.value) shabbatData.parasha = parashaElem.value;
+            if(haftarahElem && haftarahElem.value) shabbatData.haftarah = haftarahElem.value;
+
+            // 5. Collect Gallery & Donation Titles
+            const mainTitleInput = document.getElementById('galleryMainTitleInput');
+            if (mainTitleInput) {
+                galleryMainTitle = mainTitleInput.value || 'פעילות בית המדרש';
+            }
+            const donTitleInput = document.getElementById('donationTitleInput');
+            if (donTitleInput && donTitleInput.value) {
+                sectionTitles.donation = donTitleInput.value;
+            }
+
+            // 6. Collect Halacha
+            const halachaTxt = document.getElementById('halachaInput');
+            const halachaSize = document.getElementById('halachaFontSizeInput');
+            const halachaColor = document.getElementById('halachaTextColorInput');
+            const halachaStyle = document.getElementById('halachaFontStyleInput');
+            if(halachaTxt) localStorage.setItem('mp_halacha', halachaTxt.value);
+            if(halachaSize) halachaConfig.fontSize = parseFloat(halachaSize.value) || 2.3;
+            if(halachaColor) halachaConfig.color = halachaColor.value || '#f9fafb';
+            if(halachaStyle) halachaConfig.style = halachaStyle.value || 'normal';
+
+            // 7. Collect Interval
+            const intervalInput = document.getElementById('slideIntervalInput');
+            if(intervalInput) slideInterval = parseInt(intervalInput.value) || 8;
+
+            // Now perform full save to LocalStorage and Cloud
             localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
             localStorage.setItem('mp_halacha_config', JSON.stringify(halachaConfig));
             localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
@@ -657,6 +725,7 @@
                 }, 4000);
             }
 
+            applyHeaderStyles();
             buildSlides();
         }
 
@@ -1108,7 +1177,7 @@
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
             document.getElementById('systemBackupInput').value = JSON.stringify(storageData, null, 2);
-            alert('הגיבוי נוצר בתיבה בהצלחה!');
+            // Alert removed here so it generates silently without popping up
         }
 
         function restoreSystemBackup() {
