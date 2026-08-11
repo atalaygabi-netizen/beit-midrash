@@ -76,17 +76,17 @@
         .slide {
             position: absolute; top: 4px; bottom: 4px; left: 4px; right: 4px;
             opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out, visibility 0.8s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: var(--card-bg); border-radius: 16px; padding: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border: 1px solid #1f2937;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            background: var(--card-bg); border-radius: 16px; padding: 10px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.7); border: 1px solid #1f2937;
         }
 
         .slide.active { opacity: 1; visibility: visible; }
-        .slide-title { font-weight: bold; color: var(--accent); margin-bottom: 4px; border-bottom: 2px solid var(--accent); padding-bottom: 2px; width: 100%; text-align: center; }
+        .slide-title { font-weight: bold; color: var(--accent); margin-bottom: 8px; border-bottom: 2px solid var(--accent); padding-bottom: 4px; width: 100%; text-align: center; flex-shrink: 0; }
 
         .rosh-chodesh-card {
             background: linear-gradient(145deg, #0f172a, #1e3a8a); border: 3px solid #38bdf8;
             padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 12px 30px rgba(2, 132, 199, 0.4);
-            width: 90%; max-width: 1200px;
+            width: 90%; max-width: 1200px; margin-top: 15px;
         }
         .rosh-chodesh-card h2 { color: #f59e0b; font-size: 1.8rem; margin: 0 0 8px 0; }
         .rosh-chodesh-card p { color: #ffffff; font-size: 1.3rem; margin: 0; font-weight: bold; }
@@ -95,11 +95,13 @@
             background: linear-gradient(90deg, #0f172a, #1e3a8a, #0f172a);
             color: #38bdf8; padding: 6px 10px; border-radius: 8px; font-size: 1rem; font-weight: 900;
             margin-bottom: 6px; text-align: center; border: 2px solid #38bdf8; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            flex-shrink: 0;
         }
 
         .shiur-info-bar {
             background: #1e293b; width: 100%; padding: 6px 12px; border-radius: 8px; display: flex;
             justify-content: space-around; align-items: center; margin-bottom: 8px; font-size: 1rem; font-weight: bold; color: #f59e0b; border: 1px solid #374151;
+            flex-shrink: 0;
         }
         .shiur-info-bar span { color: #ffffff; }
 
@@ -113,9 +115,9 @@
             border-right: 4px solid var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center;
         }
 
-        .halacha-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; line-height: 1.4; text-align: justify; }
-        .custom-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; font-size: 1.3rem; line-height: 1.4; color: #f9fafb; text-align: center; }
-        .image-display { width: 100%; height: calc(100% - 25px); object-fit: contain; border-radius: 10px; }
+        .halacha-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; line-height: 1.4; text-align: justify; margin-top: 10px; }
+        .custom-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; font-size: 1.3rem; line-height: 1.4; color: #f9fafb; text-align: center; margin-top: 10px; }
+        .image-display { width: 100%; flex: 1; object-fit: contain; border-radius: 10px; min-height: 0; }
 
         .admin-modal, .password-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .admin-modal.open, .password-modal.open { display: flex; }
@@ -236,7 +238,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>🕐 זמני תפילות ימי חול (כולל אפשרות חישוב אוטומטי לפי שקיעה)</h3>
+                <h3>🕐 זמני תפילות ימי חול</h3>
                 <div id="weekdayItemsContainer"></div>
                 <button class="btn-action btn-success" onclick="addWeekdayItem()">+ הוסף תיבה</button>
                 <button class="btn-action" onclick="saveWeekdayTimes()">שמור זמני חול</button>
@@ -281,14 +283,18 @@
             </div>
 
             <div class="admin-section">
-                <h3>⚙️ הגדרות תצוגה וכותרת</h3>
-                <label>כותרת ראשית:</label><input type="text" id="headerTitleInput">
+                <h3>⚙️ הגדרות תצוגה וכותרות שקופיות</h3>
+                <label>כותרת ראשית (של האתר):</label><input type="text" id="headerTitleInput">
                 <label>כותרת משנה:</label><input type="text" id="headerSubtitleInput">
                 <div class="grid-2col">
-                    <div><label>יישור כותרת:</label><select id="headerAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
-                    <div><label>גודל כותרת (rem):</label><input type="number" id="headerFontSizeInput" step="0.1" value="1.6"></div>
+                    <div><label>יישור כותרת ראשית:</label><select id="headerAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
+                    <div><label>גודל כותרת ראשית (rem):</label><input type="number" id="headerFontSizeInput" step="0.1" value="1.6"></div>
                 </div>
-                <button class="btn-action" onclick="saveHeaderStyles()" style="margin-top:10px;">שמור כותרת</button>
+                <div class="grid-2col" style="margin-top: 10px;">
+                    <div><label>גודל כותרות השקופיות (rem):</label><input type="number" id="slideFontSizeInput" step="0.1" value="1.3"></div>
+                    <div><label>יישור כותרות השקופיות:</label><select id="slideAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
+                </div>
+                <button class="btn-action" onclick="saveHeaderStyles()" style="margin-top:10px;">שמור הגדרות כותרת</button>
                 <hr style="border-color:#374151; margin: 15px 0;">
                 <label for="slideIntervalInput">זמן הצגת שקופית (בשניות):</label>
                 <input type="number" id="slideIntervalInput" min="2" max="120" value="8">
@@ -413,7 +419,7 @@
             return autoHalachot[dayOfYear % autoHalachot.length];
         }
 
-        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.4 };
+        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6, slideAlign: 'center', slideFontSize: 1.3 };
         let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
         let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
         let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorners', 'donation', 'halacha', 'gallery'];
@@ -650,7 +656,7 @@
             const display = document.getElementById('mainDisplay');
             if(!display) return;
             display.innerHTML = ''; slides = [];
-            const slideTitleStyle = `text-align: ${headerConfig.slideAlign || 'center'}; font-size: ${headerConfig.slideFontSize || 1.3}rem; margin-bottom: 4px;`;
+            const slideTitleStyle = `text-align: ${headerConfig.slideAlign || 'center'}; font-size: ${headerConfig.slideFontSize || 1.3}rem;`;
             const effParasha = shabbatData.parasha || autoDefaults.parasha;
             const effHaftarah = shabbatData.haftarah || autoDefaults.haftarah;
 
@@ -778,6 +784,8 @@
             headerConfig.subtitle = document.getElementById('headerSubtitleInput').value;
             headerConfig.align = document.getElementById('headerAlignInput').value;
             headerConfig.fontSize = parseFloat(document.getElementById('headerFontSizeInput').value) || 1.6;
+            headerConfig.slideFontSize = parseFloat(document.getElementById('slideFontSizeInput').value) || 1.3;
+            headerConfig.slideAlign = document.getElementById('slideAlignInput').value;
             localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
             syncAllDataToCloud(); alert('נשמר!'); applyHeaderStyles(); buildSlides();
         }
@@ -1013,6 +1021,8 @@
             document.getElementById('headerSubtitleInput').value = headerConfig.subtitle || '';
             document.getElementById('headerAlignInput').value = headerConfig.align || 'center';
             document.getElementById('headerFontSizeInput').value = headerConfig.fontSize || 1.6;
+            document.getElementById('slideFontSizeInput').value = headerConfig.slideFontSize || 1.3;
+            document.getElementById('slideAlignInput').value = headerConfig.slideAlign || 'center';
 
             document.getElementById('halachaFontSizeInput').value = halachaConfig.fontSize || 2.3;
             document.getElementById('halachaTextColorInput').value = halachaConfig.color || '#f9fafb';
