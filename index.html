@@ -203,7 +203,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>🕯️ זמני שבת קודש (כולל שליטה על גודל הגופן לכל קובייה)</h3>
+                <h3>🕯️ זמני שבת קודש</h3>
                 <label>פרשת השבוע:</label>
                 <input type="text" id="parashaInput" placeholder="שם הפרשה">
                 <label>הפטרה:</label>
@@ -236,7 +236,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>🕐 זמני תפילות ימי חול</h3>
+                <h3>🕐 זמני תפילות ימי חול (כולל אפשרות חישוב אוטומטי לפי שקיעה)</h3>
                 <div id="weekdayItemsContainer"></div>
                 <button class="btn-action btn-success" onclick="addWeekdayItem()">+ הוסף תיבה</button>
                 <button class="btn-action" onclick="saveWeekdayTimes()">שמור זמני חול</button>
@@ -299,6 +299,51 @@
 
     <script>
         const DEFAULT_ADMIN_PASSWORD = "1234";
+
+        function getSunsetTime(date) {
+            const lat = 31.7456; 
+            const lon = 35.0322; 
+            const start = new Date(date.getFullYear(), 0, 0);
+            const diff = date - start;
+            const n = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const gamma = (2 * Math.PI / 365) * (n - 1);
+            const eqtime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+            const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+            const latRad = lat * (Math.PI / 180);
+            const zenith = 90.833 * (Math.PI / 180);
+            const cosHourAngle = (Math.cos(zenith) - Math.sin(latRad) * Math.sin(decl)) / (Math.cos(latRad) * Math.cos(decl));
+            
+            if (cosHourAngle > 1 || cosHourAngle < -1) return { hours: 19, minutes: 25, totalMinutes: 1165 };
+            
+            const hourAngle = Math.acos(cosHourAngle) * (180 / Math.PI);
+            const tzOffset = -date.getTimezoneOffset();
+            const solarNoonUTC = 720 - (4 * lon) - eqtime;
+            const sunsetUTC = solarNoonUTC + (hourAngle * 4);
+            const sunsetLocalMinutes = sunsetUTC + tzOffset;
+            
+            let hours = Math.floor(sunsetLocalMinutes / 60) % 24;
+            let minutes = Math.round(sunsetLocalMinutes % 60);
+            if (minutes >= 60) { minutes = 0; hours = (hours + 1) % 24; }
+            if (hours < 0) hours += 24;
+            
+            return { hours, minutes, totalMinutes: hours * 60 + minutes };
+        }
+
+        function getResolvedItemTime(item) {
+            if (item.isAutoSunset) {
+                const sunset = getSunsetTime(new Date());
+                const offset = item.sunsetOffset !== undefined ? item.sunsetOffset : -20;
+                let totalMin = sunset.totalMinutes + offset;
+                let h = Math.floor(totalMin / 60) % 24;
+                let m = totalMin % 60;
+                if (m < 0) { m += 60; h -= 1; }
+                if (h < 0) h += 24;
+                const hh = String(h).padStart(2, '0');
+                const mm = String(m).padStart(2, '0');
+                return `${hh}:${mm}`;
+            }
+            return item.time;
+        }
 
         const shabbatCalendarSchedule = {
             "2026-08-15": { parasha: "פרשת שופטים", haftarah: "ישעיהו נ\"א, י\"ב - נ\"ב, י\"ב (אנכי אנכי)" },
@@ -377,10 +422,10 @@
 
         let roshChodeshConfig = JSON.parse(localStorage.getItem('mp_rc_config')) || { active: true, title: 'הודעה מיוחדת לשבוע זה', cardTitle: '🌙 ראש חודש קרוב', customText: '' };
 
-        let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v3')) || [
-            { title: 'שחרית', time: '06:30', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff' },
-            { title: 'מנחה', time: '19:00', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff' },
-            { title: 'ערבית', time: '19:45', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff' }
+        let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v4')) || [
+            { title: 'שחרית', time: '06:30', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: false, sunsetOffset: -20 },
+            { title: 'מנחה', time: '19:00', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: true, sunsetOffset: -20 },
+            { title: 'ערבית', time: '19:45', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: false, sunsetOffset: 20 }
         ];
         
         let autoDefaults = getAutoShabbatDetails();
@@ -592,10 +637,11 @@
 
         function createTimeBoxHtml(item) {
             const baseSize = item.fontSize || 1.6;
+            const displayedTime = getResolvedItemTime(item);
             return `
                 <div class="time-box">
                     <h3 style="color:${item.titleColor || '#d1d5db'}; font-size: calc(${baseSize}rem * 0.55); margin: 2px 0;">${item.title}</h3>
-                    <div class="time-val" style="color:${item.timeColor || '#ffffff'}; font-size: calc(${baseSize}rem * 0.85);">${item.time}</div>
+                    <div class="time-val" style="color:${item.timeColor || '#ffffff'}; font-size: calc(${baseSize}rem * 0.85);">${displayedTime}</div>
                 </div>
             `;
         }
@@ -772,15 +818,26 @@
                 <div class="time-box-admin-card">
                     <div class="time-box-admin-card-header"><strong>תיבה #${idx+1}</strong><button class="btn-action btn-danger" onclick="weekdayTimes.splice(${idx},1);renderWeekdayAdminItems();">מחק</button></div>
                     <div class="grid-2col">
-                        <input type="text" value="${item.title}" onchange="weekdayTimes[${idx}].title=this.value">
-                        <input type="text" value="${item.time}" onchange="weekdayTimes[${idx}].time=this.value">
+                        <input type="text" value="${item.title}" placeholder="שם התפילה" onchange="weekdayTimes[${idx}].title=this.value">
+                        <input type="text" value="${item.time}" placeholder="שעה רגילה" ${item.isAutoSunset ? 'disabled style="opacity:0.5"' : ''} onchange="weekdayTimes[${idx}].time=this.value">
+                    </div>
+                    <div style="margin-top: 5px; display: flex; flex-direction: column; gap: 5px;">
+                        <label style="font-weight: normal; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" ${item.isAutoSunset ? 'checked' : ''} onchange="weekdayTimes[${idx}].isAutoSunset=this.checked; renderWeekdayAdminItems();"> חישוב אוטומטי לפי שקיעה
+                        </label>
+                        ${item.isAutoSunset ? `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 0.85rem; color: #38bdf8;">הפרש דקות מהשקיעה (למשל -20):</span>
+                                <input type="number" value="${item.sunsetOffset !== undefined ? item.sunsetOffset : -20}" style="width: 100px;" onchange="weekdayTimes[${idx}].sunsetOffset=parseInt(this.value)||0">
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
         }
 
-        function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00' }); renderWeekdayAdminItems(); }
-        function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v3', JSON.stringify(weekdayTimes)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
+        function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00', fontSize: 1.6, isAutoSunset: false, sunsetOffset: -20 }); renderWeekdayAdminItems(); }
+        function saveWeekdayTimes() { localStorage.setItem('mp_weekday_times_v4', JSON.stringify(weekdayTimes)); syncAllDataToCloud(); alert('נשמר!'); buildSlides(); }
 
         function renderShabbatAdminItems() {
             const friElem = document.getElementById('fridayItemsContainer');
@@ -929,7 +986,7 @@
         }
 
         function generateSystemBackup() {
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
             document.getElementById('systemBackupInput').value = JSON.stringify(storageData, null, 2);
@@ -987,7 +1044,7 @@
 
         function exportCompleteHtmlFile() {
             let docClone = document.documentElement.cloneNode(true);
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v3', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let storageData = {};
             keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) storageData[k] = v; });
 
