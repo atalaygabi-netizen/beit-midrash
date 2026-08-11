@@ -116,7 +116,6 @@
         }
 
         .halacha-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; line-height: 1.4; text-align: justify; margin-top: 10px; white-space: pre-line; }
-        .custom-box { background: #030712; padding: 18px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 90%; max-width: 1400px; line-height: 1.4; color: #f9fafb; text-align: center; margin-top: 10px; white-space: pre-line; }
         .image-display { width: 100%; flex: 1; object-fit: contain; border-radius: 10px; min-height: 0; }
 
         .img-overlay-container { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 6px; border-radius: 10px; }
@@ -135,6 +134,35 @@
             white-space: pre-line;
         }
         .img-overlay-text:active { cursor: grabbing; }
+
+        /* תצוגה מקדימה בתוך הניהול */
+        .admin-preview-box {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px dashed #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .admin-preview-box img { width: 100%; height: 100%; object-fit: contain; }
+        .admin-preview-text {
+            position: absolute;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 80%;
+            white-space: pre-line;
+            z-index: 10;
+        }
+        .admin-preview-text:active { cursor: grabbing; }
 
         .admin-modal, .password-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .admin-modal.open, .password-modal.open { display: flex; }
@@ -180,7 +208,7 @@
 
     <div class="main-display" id="mainDisplay">
         <div style="text-align:center; color:var(--text-muted); font-size:1.2rem;">
-            טוען מערכת... לחץ על גלגל השיניים ⚙️ בפינה השמאלית העליונה לניהול.
+            טוען מערכת...
         </div>
     </div>
 
@@ -254,7 +282,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>🖼️ פעילות בית המדרש / גלריה (כולל עיצוב, גרירה ומיקום מדויק)</h3>
+                <h3>🖼️ פעילות בית המדרש / גלריה (כולל תצוגה מקדימה וגרירת טקסט חופשית)</h3>
                 <label>כותרת עליונה לגלריה:</label>
                 <input type="text" id="galleryMainTitleInput" placeholder="למשל: פעילויות בית המדרש">
                 <br>
@@ -295,7 +323,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>📌 פינות מותאמות אישית (עם צבעים, גופנים, גרירה ומיקום מדויק)</h3>
+                <h3>📌 פינות מותאמות אישית (עם תצוגה מקדימה אינטראקטיבית וגרירת טקסט)</h3>
                 <div id="customCornersContainer"></div>
                 <button class="btn-action btn-success" onclick="addCustomCornerBox()" style="margin-top: 10px;">+ הוסף פינה חדשה</button>
                 <br><br>
@@ -501,6 +529,13 @@
                 startRotation();
                 initTouchSwipeEvents();
                 initDisplayClickHandler();
+
+                // רענון אוטומטי מלא של העמוד כל דקה (רק אם הניהול סגור)
+                setInterval(() => {
+                    if (!isPaused) {
+                        location.reload();
+                    }
+                }, 60000);
 
                 const donElem = document.getElementById('donationImgInput');
                 if (donElem) {
@@ -778,7 +813,7 @@
             return isBottom ? `${contentHtml}${titleHtml}` : `${titleHtml}${contentHtml}`;
         }
 
-        function makeElementDraggable(element, itemObj, containerElement) {
+        function makeElementDraggable(element, itemObj, containerElement, posXInput, posYInput) {
             let isDragging = false;
             let startX, startY;
 
@@ -813,6 +848,9 @@
                 itemObj.posX = leftPercent;
                 itemObj.posY = topPercent;
 
+                if (posXInput) posXInput.value = Math.round(leftPercent);
+                if (posYInput) posYInput.value = Math.round(topPercent);
+
                 element.style.left = leftPercent + '%';
                 element.style.top = topPercent + '%';
                 element.style.transform = 'none';
@@ -836,13 +874,11 @@
         }
 
         function buildOverlayHtml(item) {
-            if (!item.src) return '';
-            if (!item.text || item.text.trim() === '') return `<img src="${item.src}" class="image-display">`;
-
             const bg = item.bgColor || 'rgba(0,0,0,0.85)';
             const color = item.textColor || '#ffffff';
             const font = item.fontFamily || "'Heebo', sans-serif";
             const fontSize = item.fontSize !== undefined ? `font-size: ${item.fontSize}rem;` : 'font-size: 1.5rem;';
+            const textContent = item.text || item.caption || '';
             
             let posStyle = '';
             if (item.posX !== undefined && item.posY !== undefined) {
@@ -860,12 +896,20 @@
                 }
             }, 50);
 
-            return `
-                <div class="img-overlay-container">
-                    <img src="${item.src}" class="image-display">
-                    <div id="${overlayId}" class="img-overlay-text" style="background: ${bg}; color: ${color}; font-family: ${font}; ${fontSize} ${posStyle}">${item.text}</div>
-                </div>
-            `;
+            if (item.src) {
+                return `
+                    <div class="img-overlay-container">
+                        <img src="${item.src}" class="image-display">
+                        ${textContent ? `<div id="${overlayId}" class="img-overlay-text" style="background: ${bg}; color: ${color}; font-family: ${font}; ${fontSize} ${posStyle}">${textContent}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="img-overlay-container" style="background: transparent;">
+                        <div id="${overlayId}" class="img-overlay-text" style="background: ${bg}; color: ${color}; font-family: ${font}; ${fontSize} ${posStyle} padding: 25px; border-radius: 16px; border-right: 6px solid var(--accent); box-shadow: 0 10px 25px rgba(0,0,0,0.7);">${textContent || 'הכנס טקסט בניהול...'}</div>
+                    </div>
+                `;
+            }
         }
 
         function buildSlides() {
@@ -920,13 +964,7 @@
                     customCorners.forEach(corner => {
                         if (corner.active !== false) {
                             const cornerSlide = document.createElement('div'); cornerSlide.className = 'slide';
-                            let cornerContent = '';
-                            if (corner.src) {
-                                cornerContent = buildOverlayHtml(corner);
-                            } else {
-                                const fSize = corner.fontSize ? `font-size: ${corner.fontSize}rem;` : 'font-size: 1.5rem;';
-                                cornerContent = corner.text ? `<div class="custom-box" style="${fSize}">${corner.text}</div>` : '';
-                            }
+                            let cornerContent = buildOverlayHtml(corner);
                             cornerSlide.innerHTML = createSlideHtml('customCorners', corner.title || 'פינה מותאמת אישית', cornerContent);
                             display.appendChild(cornerSlide); slides.push(cornerSlide);
                         }
@@ -1102,47 +1140,77 @@
 
         function renderCustomCornersAdmin() {
             const container = document.getElementById('customCornersContainer'); if(!container) return;
-            container.innerHTML = customCorners.map((corner, idx) => `
-                <div class="custom-corner-admin-card">
-                    <div class="custom-corner-admin-card-header"><strong>פינה #${idx+1}</strong><button class="btn-action btn-danger" onclick="customCorners.splice(${idx},1);renderCustomCornersAdmin();">מחק פינה</button></div>
-                    <label><input type="checkbox" class="cc-active" ${corner.active !== false ? 'checked' : ''}> הצג שקופית זו</label>
-                    <label>כותרת הפינה:</label><input type="text" class="cc-title" value="${corner.title || ''}">
-                    <label>טקסט להצגה (ניתן לרדת שורות עם Enter):</label><textarea class="cc-text" style="height: 80px;" placeholder="הכנס טקסט...">${corner.text || ''}</textarea>
-                    
-                    <div class="grid-3col">
-                        <div>
-                            <label>גודל כתב (rem):</label>
-                            <input type="number" step="0.1" class="cc-fontsize" value="${corner.fontSize !== undefined ? corner.fontSize : 1.5}">
-                        </div>
-                        <div>
-                            <label>תמה / צבע רקע:</label>
-                            <select class="cc-bgcolor">
-                                ${bgOptionsList.replace(`value="${corner.bgColor}"`, `value="${corner.bgColor}" selected`)}
-                            </select>
-                        </div>
-                        <div>
-                            <label>גופן (סגנון כתיבה):</label>
-                            <select class="cc-font">
-                                ${fontOptionsList.replace(`value="${corner.fontFamily}"`, `value="${corner.fontFamily}" selected`)}
-                            </select>
-                        </div>
-                    </div>
+            container.innerHTML = customCorners.map((corner, idx) => {
+                const previewId = 'admin_preview_' + idx;
+                const textElemId = 'admin_text_' + idx;
+                const posXId = 'cc_posx_' + idx;
+                const posYId = 'cc_posy_' + idx;
 
-                    <div class="grid-2col">
-                        <div><label>מיקום אופקי X (%):</label><input type="number" min="0" max="100" class="cc-posx" value="${corner.posX !== undefined ? corner.posX : 50}"></div>
-                        <div><label>מיקום אנכי Y (%):</label><input type="number" min="0" max="100" class="cc-posy" value="${corner.posY !== undefined ? corner.posY : 50}"></div>
-                    </div>
+                setTimeout(() => {
+                    const containerEl = document.getElementById(previewId);
+                    const textEl = document.getElementById(textElemId);
+                    const posXIn = document.getElementById(posXId);
+                    const posYIn = document.getElementById(posYId);
+                    if (containerEl && textEl) {
+                        makeElementDraggable(textEl, corner, containerEl, posXIn, posYIn);
+                    }
+                }, 50);
 
-                    <div>
-                        <label>צבע טקסט:</label>
-                        <input type="color" class="cc-textcolor" value="${corner.textColor || '#ffffff'}">
-                    </div>
+                const posStyle = `left: ${corner.posX !== undefined ? corner.posX : 50}%; top: ${corner.posY !== undefined ? corner.posY : 50}%; transform: none;`;
+                const bg = corner.bgColor || 'rgba(0,0,0,0.85)';
+                const color = corner.textColor || '#ffffff';
+                const font = corner.fontFamily || "'Heebo', sans-serif";
+                const fontSize = corner.fontSize !== undefined ? `font-size: ${corner.fontSize}rem;` : 'font-size: 1.5rem;';
 
-                    <input type="file" accept="image/*" id="ccFile_${idx}" style="display:none;" onchange="if(this.files[0]){compressAndResizeImage(this.files[0], url => { customCorners[${idx}].src = url; renderCustomCornersAdmin(); });}">
-                    <button class="btn-action btn-info" onclick="document.getElementById('ccFile_${idx}').click()">📁 בחר תמונה</button>
-                    ${corner.src ? `<div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;"><img src="${corner.src}" style="max-height: 70px; object-fit: contain;"><button class="btn-action btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="customCorners[${idx}].src=''; renderCustomCornersAdmin();">מחק תמונה</button></div>` : ''}
-                </div>
-            `).join('');
+                return `
+                    <div class="custom-corner-admin-card">
+                        <div class="custom-corner-admin-card-header"><strong>פינה #${idx+1}</strong><button class="btn-action btn-danger" onclick="customCorners.splice(${idx},1);renderCustomCornersAdmin();">מחק פינה</button></div>
+                        <label><input type="checkbox" class="cc-active" ${corner.active !== false ? 'checked' : ''}> הצג שקופית זו</label>
+                        <label>כותרת הפינה:</label><input type="text" class="cc-title" value="${corner.title || ''}" oninput="document.getElementById('${textElemId}').innerText = this.value">
+                        <label>טקסט להצגה (ניתן לרדת שורות עם Enter):</label><textarea class="cc-text" style="height: 80px;" placeholder="הכנס טקסט..." oninput="document.getElementById('${textElemId}').innerText = this.value">${corner.text || ''}</textarea>
+                        
+                        <!-- תצוגה מקדימה חיה בתוך הניהול -->
+                        <label>תצוגה מקדימה (גרור את הכתב עם העכבר כדי למקם):</label>
+                        <div id="${previewId}" class="admin-preview-box">
+                            ${corner.src ? `<img src="${corner.src}">` : '<div style="color:var(--text-muted); font-size:0.9rem;">אין תמונה - טקסט חופשי במסך</div>'}
+                            <div id="${textElemId}" class="admin-preview-text" style="background: ${bg}; color: ${color}; font-family: ${font}; ${fontSize} ${posStyle}">${corner.text || 'טקסט לדוגמה'}</div>
+                        </div>
+
+                        <div class="grid-3col" style="margin-top: 10px;">
+                            <div>
+                                <label>גודל כתב (rem):</label>
+                                <input type="number" step="0.1" class="cc-fontsize" value="${corner.fontSize !== undefined ? corner.fontSize : 1.5}" oninput="document.getElementById('${textElemId}').style.fontSize = this.value + 'rem';">
+                            </div>
+                            <div>
+                                <label>תמה / צבע רקע:</label>
+                                <select class="cc-bgcolor" onchange="document.getElementById('${textElemId}').style.background = this.value;">
+                                    ${bgOptionsList.replace(`value="${corner.bgColor}"`, `value="${corner.bgColor}" selected`)}
+                                </select>
+                            </div>
+                            <div>
+                                <label>גופן:</label>
+                                <select class="cc-font" onchange="document.getElementById('${textElemId}').style.fontFamily = this.value;">
+                                    ${fontOptionsList.replace(`value="${corner.fontFamily}"`, `value="${corner.fontFamily}" selected`)}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2col">
+                            <div><label>מיקום אופקי X (%):</label><input type="number" min="0" max="100" id="${posXId}" class="cc-posx" value="${corner.posX !== undefined ? corner.posX : 50}" oninput="corner.posX=parseFloat(this.value)||50; document.getElementById('${textElemId}').style.left=corner.posX+'%';"></div>
+                            <div><label>מיקום אנכי Y (%):</label><input type="number" min="0" max="100" id="${posYId}" class="cc-posy" value="${corner.posY !== undefined ? corner.posY : 50}" oninput="corner.posY=parseFloat(this.value)||50; document.getElementById('${textElemId}').style.top=corner.posY+'%';"></div>
+                        </div>
+
+                        <div>
+                            <label>צבע טקסט:</label>
+                            <input type="color" class="cc-textcolor" value="${corner.textColor || '#ffffff'}" oninput="document.getElementById('${textElemId}').style.color = this.value;">
+                        </div>
+
+                        <input type="file" accept="image/*" id="ccFile_${idx}" style="display:none;" onchange="if(this.files[0]){compressAndResizeImage(this.files[0], url => { customCorners[${idx}].src = url; renderCustomCornersAdmin(); });}">
+                        <button class="btn-action btn-info" onclick="document.getElementById('ccFile_${idx}').click()">📁 בחר תמונה</button>
+                        ${corner.src ? `<div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;"><img src="${corner.src}" style="max-height: 70px; object-fit: contain;"><button class="btn-action btn-danger" style="padding: 5px 10px; font-size: 0.8rem;" onclick="customCorners[${idx}].src=''; renderCustomCornersAdmin();">מחק תמונה</button></div>` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         function renderGalleryAdminItems() {
