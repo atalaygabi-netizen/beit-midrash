@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בית המדרש מבקשי פניך</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;700&family=Varela+Round&display=swap" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -21,7 +23,7 @@
         * { box-sizing: border-box; }
 
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
             color: var(--text-light);
             margin: 0;
@@ -119,12 +121,19 @@
 
         .img-overlay-container { position: relative; width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 6px; border-radius: 10px; }
         .img-overlay-container img { width: 100%; height: 100%; object-fit: contain; }
-        .img-overlay-text { position: absolute; padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; z-index: 5; }
         
-        .style-classic { top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.2); font-size: 1.6rem; color: #fff; }
-        .style-ribbon { bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); width: 100%; font-size: 1.4rem; border-radius: 0; color: #fff; }
-        .style-elegant { top: 20px; left: 20px; background: rgba(255,255,255,0.92); color: #000; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .style-corner { bottom: 20px; right: 20px; background: var(--accent); color: #000; font-size: 1.2rem; border-radius: 5px; padding: 8px 16px; }
+        .img-overlay-text {
+            position: absolute;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 5;
+            cursor: grab;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            max-width: 80%;
+        }
+        .img-overlay-text:active { cursor: grabbing; }
 
         .admin-modal, .password-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .admin-modal.open, .password-modal.open { display: flex; }
@@ -168,7 +177,11 @@
         <div class="time-progress-bar" id="timeProgressBar" style="width: 0%;"></div>
     </div>
 
-    <div class="main-display" id="mainDisplay"></div>
+    <div class="main-display" id="mainDisplay">
+        <div style="text-align:center; color:var(--text-muted); font-size:1.2rem;">
+            טוען מערכת... לחץ על גלגל השיניים ⚙️ בפינה השמאלית העליונה לניהול.
+        </div>
+    </div>
 
     <div class="admin-modal" id="adminModal">
         <div class="modal-content">
@@ -200,7 +213,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>🎨 עריכה פרטנית לכותרות השקופיות (מיקום, גודל וטקסט לכל שקופית)</h3>
+                <h3>🎨 עריכה פרטנית לכותרות השקופיות</h3>
                 <div id="slideTitlesAdminContainer"></div>
                 <button class="btn-action" onclick="saveSlideTitlesConfig()" style="margin-top: 10px;">שמור הגדרות כותרות שקופיות</button>
             </div>
@@ -212,7 +225,7 @@
                 <input type="text" id="rcTitleInput" placeholder="הודעה מיוחדת לשבוע זה">
                 <label>כותרת ראשית בתוך התיבה:</label>
                 <input type="text" id="rcCardTitleInput" placeholder="🌙 ראש חודש קרוב">
-                <label>תוכן ההודעה (אם ישאר ריק, יחושב אוטומטית לפי תאריך עברי):</label>
+                <label>תוכן ההודעה:</label>
                 <textarea id="rcCustomTextInput" placeholder="למשל: בשבוע זה יחול ראש חודש..."></textarea>
                 <button class="btn-action" onclick="saveRoshChodeshConfig()">שמור הודעת ראש חודש</button>
             </div>
@@ -240,8 +253,8 @@
             </div>
 
             <div class="admin-section">
-                <h3>🖼️ פעילות בית המדרש / גלריה</h3>
-                <label>כותרת עליונה לגלריה (תוצג מעל כל התמונות):</label>
+                <h3>🖼️ פעילות בית המדרש / גלריה (כולל עיצוב, גרירה ומיקום מדויק)</h3>
+                <label>כותרת עליונה לגלריה:</label>
                 <input type="text" id="galleryMainTitleInput" placeholder="למשל: פעילויות בית המדרש">
                 <br>
                 <input type="file" id="activityImgInput" accept="image/*" style="display:none;" onchange="handleGalleryImageUpload(this)">
@@ -281,7 +294,7 @@
             </div>
 
             <div class="admin-section">
-                <h3>📌 פינות מותאמות אישית נוספות</h3>
+                <h3>📌 פינות מותאמות אישית (עם צבעים, גופנים, גרירה ומיקום מדויק)</h3>
                 <div id="customCornersContainer"></div>
                 <button class="btn-action btn-success" onclick="addCustomCornerBox()" style="margin-top: 10px;">+ הוסף פינה חדשה</button>
                 <br><br>
@@ -302,7 +315,7 @@
 
             <div class="admin-section">
                 <h3>⚙️ הגדרות כותרת ראשית של האתר</h3>
-                <label>כותרת ראשית (של האתר):</label><input type="text" id="headerTitleInput">
+                <label>כותרת ראשית:</label><input type="text" id="headerTitleInput">
                 <label>כותרת משנה:</label><input type="text" id="headerSubtitleInput">
                 <div class="grid-2col">
                     <div><label>יישור כותרת ראשית:</label><select id="headerAlignInput"><option value="center">מרכז</option><option value="right">ימינה</option><option value="left">שמאלה</option></select></div>
@@ -421,42 +434,30 @@
             return autoHalachot[Math.floor(((now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000)) / (1000 * 60 * 60 * 24)) % autoHalachot.length];
         }
 
-        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config')) || { title: 'בית המדרש "מבקשי פניך"', subtitle: 'תורה • תפילה • גמילות חסדים', align: 'center', fontSize: 1.6 };
-        let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config')) || { fontSize: 2.3, color: '#f9fafb', style: 'normal' };
-        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
+        let headerConfig = JSON.parse(localStorage.getItem('mp_header_config') || '{"title":"בית המדרש \\"מבקשי פניך\\"","subtitle":"תורה • תפילה • גמילות חסדים","align":"center","fontSize":1.6}');
+        let halachaConfig = JSON.parse(localStorage.getItem('mp_halacha_config') || '{"fontSize":2.3,"color":"#f9fafb","style":"normal"}');
+        let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles') || '{"weekday":"זמני תפילות ימי חול","shabbat":"זמני שבת קודש","shiurim":"שיעורים מרכזיים בבית המדרש","donation":"לתרומות לאחזקת בית המדרש","halacha":"הלכה יומית"}');
         
-        let slideTitleConfigs = JSON.parse(localStorage.getItem('mp_slide_title_configs')) || {
-            weekday: { title: 'זמני תפילות ימי חול', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            shabbat: { title: 'זמני שבת קודש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            shiurim: { title: 'שיעורים מרכזיים בבית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            customCorners: { title: 'פינה מותאמת אישית', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            donation: { title: 'לתרומות לאחזקת בית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            halacha: { title: 'הלכה יומית', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
-            gallery: { title: 'פעילויות בית המדרש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 }
-        };
+        let slideTitleConfigs = JSON.parse(localStorage.getItem('mp_slide_title_configs') || '{"weekday":{"title":"זמני תפילות ימי חול","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"shabbat":{"title":"זמני שבת קודש","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"shiurim":{"title":"שיעורים מרכזיים בבית המדרש","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"customCorners":{"title":"פינה מותאמת אישית","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"donation":{"title":"לתרומות לאחזקת בית המדרש","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"halacha":{"title":"הלכה יומית","fontSize":1.3,"align":"center","verticalPos":"top","margin":8},"gallery":{"title":"פעילויות בית המדרש","fontSize":1.3,"align":"center","verticalPos":"top","margin":8}}');
 
-        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order')) || ['shiurim', 'weekday', 'shabbat', 'customCorners', 'donation', 'halacha', 'gallery'];
+        let sectionOrder = JSON.parse(localStorage.getItem('mp_section_order') || '["shiurim","weekday","shabbat","customCorners","donation","halacha","gallery"]');
         if (!sectionOrder.includes('customCorners')) sectionOrder.push('customCorners');
 
-        let roshChodeshConfig = JSON.parse(localStorage.getItem('mp_rc_config')) || { active: true, title: 'הודעה מיוחדת לשבוע זה', cardTitle: '🌙 ראש חודש קרוב', customText: '' };
-        let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v4')) || [
-            { title: 'שחרית', time: '06:30', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: false, sunsetOffset: -20 },
-            { title: 'מנחה', time: '19:00', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: true, sunsetOffset: -20 },
-            { title: 'ערבית', time: '19:45', fontSize: 1.6, titleColor: '#d1d5db', timeColor: '#ffffff', isAutoSunset: false, sunsetOffset: 20 }
-        ];
+        let roshChodeshConfig = JSON.parse(localStorage.getItem('mp_rc_config') || '{"active":true,"title":"הודעה מיוחדת לשבוע זה","cardTitle":"🌙 ראש חודש קרוב","customText":""}');
+        let weekdayTimes = JSON.parse(localStorage.getItem('mp_weekday_times_v4') || '[{"title":"שחרית","time":"06:30","fontSize":1.6,"titleColor":"#d1d5db","timeColor":"#ffffff","isAutoSunset":false,"sunsetOffset":-20},{"title":"מנחה","time":"19:00","fontSize":1.6,"titleColor":"#d1d5db","timeColor":"#ffffff","isAutoSunset":true,"sunsetOffset":-20},{"title":"ערבית","time":"19:45","fontSize":1.6,"titleColor":"#d1d5db","timeColor":"#ffffff","isAutoSunset":false,"sunsetOffset":20}]');
         
         let autoDefaults = getAutoShabbatDetails();
-        let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3')) || {};
-        shabbatData.parasha = autoDefaults.parasha;
-        shabbatData.haftarah = autoDefaults.haftarah;
+        let shabbatData = JSON.parse(localStorage.getItem('mp_shabbat_data_v3') || '{}');
+        shabbatData.parasha = shabbatData.parasha || autoDefaults.parasha;
+        shabbatData.haftarah = shabbatData.haftarah || autoDefaults.haftarah;
         if (!shabbatData.fridayItems) shabbatData.fridayItems = [{ title: 'כניסת שבת', time: '18:45', fontSize: 1.6 }];
         if (!shabbatData.saturdayItems) shabbatData.saturdayItems = [{ title: 'שחרית שבת', time: '08:30', fontSize: 1.6 }, { title: 'צאת השבת', time: '19:42', fontSize: 1.6 }];
 
         let upcomingRoshChodeshText = '';
-        let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3')) || [];
-        let customCorners = JSON.parse(localStorage.getItem('mp_custom_corners_v2')) || [];
+        let shiurimByDays = JSON.parse(localStorage.getItem('mp_shiurim_by_days_v3') || '[]');
+        let customCorners = JSON.parse(localStorage.getItem('mp_custom_corners_v4') || '[]');
         let galleryMainTitle = localStorage.getItem('mp_gallery_main_title') || 'פעילויות בית המדרש';
-        let gallery = JSON.parse(localStorage.getItem('mp_gallery_v2')) || [];
+        let gallery = JSON.parse(localStorage.getItem('mp_gallery_v4') || '[]');
         let donationImg = localStorage.getItem('mp_donation_img') || '';
         let slideInterval = parseInt(localStorage.getItem('mp_interval')) || 8;
 
@@ -466,7 +467,8 @@
 
         window.onload = function() {
             try {
-                document.getElementById('slideIntervalInput').value = slideInterval;
+                const intervalEl = document.getElementById('slideIntervalInput');
+                if (intervalEl) intervalEl.value = slideInterval;
                 applyHeaderStyles();
                 calculateInternalHebrewCalendar();
                 initFirebaseConnection();
@@ -490,14 +492,14 @@
                         }
                     });
                 }
-            } catch (e) { buildSlides(); startRotation(); }
+            } catch (e) { console.error(e); buildSlides(); startRotation(); }
         };
 
         function initDisplayClickHandler() {
             const mainDisplay = document.getElementById('mainDisplay');
             if (!mainDisplay) return;
             mainDisplay.addEventListener('click', function(e) {
-                if (e.target.closest('.admin-modal') || e.target.closest('.password-modal')) return;
+                if (e.target.closest('.admin-modal') || e.target.closest('.password-modal') || e.target.closest('.img-overlay-text')) return;
                 const rect = this.getBoundingClientRect();
                 if ((e.clientX - rect.left) < rect.width / 2) nextSlide();
                 else prevSlide();
@@ -578,11 +580,17 @@
                 document.querySelectorAll('.slide-title-admin-card').forEach(card => {
                     const k = card.getAttribute('data-key');
                     if (!slideTitleConfigs[k]) slideTitleConfigs[k] = {};
-                    slideTitleConfigs[k].title = card.querySelector('.st-title').value;
-                    slideTitleConfigs[k].fontSize = parseFloat(card.querySelector('.st-fontsize').value) || 1.3;
-                    slideTitleConfigs[k].align = card.querySelector('.st-align').value;
-                    slideTitleConfigs[k].verticalPos = card.querySelector('.st-vertical').value;
-                    slideTitleConfigs[k].margin = parseInt(card.querySelector('.st-margin').value) || 8;
+                    const titleInput = card.querySelector('.st-title');
+                    const fontsizeInput = card.querySelector('.st-fontsize');
+                    const alignInput = card.querySelector('.st-align');
+                    const verticalInput = card.querySelector('.st-vertical');
+                    const marginInput = card.querySelector('.st-margin');
+
+                    if (titleInput) slideTitleConfigs[k].title = titleInput.value;
+                    if (fontsizeInput) slideTitleConfigs[k].fontSize = parseFloat(fontsizeInput.value) || 1.3;
+                    if (alignInput) slideTitleConfigs[k].align = alignInput.value;
+                    if (verticalInput) slideTitleConfigs[k].verticalPos = verticalInput.value;
+                    if (marginInput) slideTitleConfigs[k].margin = parseInt(marginInput.value) || 8;
                 });
 
                 roshChodeshConfig.active = document.getElementById('rcActiveInput')?.checked;
@@ -597,19 +605,40 @@
 
                 document.querySelectorAll('.gallery-admin-card').forEach((card, idx) => {
                     const cap = card.querySelector('.gal-caption');
-                    const styleSel = card.querySelector('.gal-style');
+                    const bgCol = card.querySelector('.gal-bgcolor');
+                    const txtCol = card.querySelector('.gal-textcolor');
+                    const fontFam = card.querySelector('.gal-font');
+                    const posXVal = parseFloat(card.querySelector('.gal-posx')?.value);
+                    const posYVal = parseFloat(card.querySelector('.gal-posy')?.value);
                     if (gallery[idx]) {
                         if (cap) gallery[idx].caption = cap.value;
-                        if (styleSel) gallery[idx].style = styleSel.value;
+                        if (bgCol) gallery[idx].bgColor = bgCol.value;
+                        if (txtCol) gallery[idx].textColor = txtCol.value;
+                        if (fontFam) gallery[idx].fontFamily = fontFam.value;
+                        if (!isNaN(posXVal)) gallery[idx].posX = posXVal;
+                        if (!isNaN(posYVal)) gallery[idx].posY = posYVal;
                     }
                 });
 
                 document.querySelectorAll('.custom-corner-admin-card').forEach((card, idx) => {
+                    const activeInput = card.querySelector('.cc-active');
+                    const titleInput = card.querySelector('.cc-title');
+                    const textInput = card.querySelector('.cc-text');
+                    const bgCol = card.querySelector('.cc-bgcolor');
+                    const txtCol = card.querySelector('.cc-textcolor');
+                    const fontFam = card.querySelector('.cc-font');
+                    const posXVal = parseFloat(card.querySelector('.cc-posx')?.value);
+                    const posYVal = parseFloat(card.querySelector('.cc-posy')?.value);
+
                     if (customCorners[idx]) {
-                        customCorners[idx].active = card.querySelector('.cc-active').checked;
-                        customCorners[idx].title = card.querySelector('.cc-title').value;
-                        customCorners[idx].text = card.querySelector('.cc-text').value;
-                        customCorners[idx].style = card.querySelector('.cc-style').value;
+                        if (activeInput) customCorners[idx].active = activeInput.checked;
+                        if (titleInput) customCorners[idx].title = titleInput.value;
+                        if (textInput) customCorners[idx].text = textInput.value;
+                        if (bgCol) customCorners[idx].bgColor = bgCol.value;
+                        if (txtCol) customCorners[idx].textColor = txtCol.value;
+                        if (fontFam) customCorners[idx].fontFamily = fontFam.value;
+                        if (!isNaN(posXVal)) customCorners[idx].posX = posXVal;
+                        if (!isNaN(posYVal)) customCorners[idx].posY = posYVal;
                     }
                 });
 
@@ -627,8 +656,8 @@
                 localStorage.setItem('mp_weekday_times_v4', JSON.stringify(weekdayTimes));
                 localStorage.setItem('mp_shabbat_data_v3', JSON.stringify(shabbatData));
                 localStorage.setItem('mp_shiurim_by_days_v3', JSON.stringify(shiurimByDays));
-                localStorage.setItem('mp_custom_corners_v2', JSON.stringify(customCorners));
-                localStorage.setItem('mp_gallery_v2', JSON.stringify(gallery));
+                localStorage.setItem('mp_custom_corners_v4', JSON.stringify(customCorners));
+                localStorage.setItem('mp_gallery_v4', JSON.stringify(gallery));
                 localStorage.setItem('mp_gallery_main_title', galleryMainTitle);
                 localStorage.setItem('mp_donation_img', donationImg);
                 localStorage.setItem('mp_interval', slideInterval);
@@ -644,7 +673,11 @@
                 applyHeaderStyles(); buildSlides();
             } catch (err) {
                 console.error("Save error:", err);
-                alert("אירעה שגיאה בשמירה, אך הנתונים בטוחים.");
+                if (err.name === 'QuotaExceededError' || err.code === 22) {
+                    alert("שגיאה: נפח האחסון המקומי התמלא כי תמונת הרקע גדולה מדי. נא להקטין את קובץ התמונה או לבחור תמונה קטנה יותר.");
+                } else {
+                    alert("אירעה שגיאה בשמירה: " + err.message);
+                }
             }
         }
 
@@ -717,6 +750,95 @@
             return isBottom ? `${contentHtml}${titleHtml}` : `${titleHtml}${contentHtml}`;
         }
 
+        function makeElementDraggable(element, itemObj, containerElement) {
+            let isDragging = false;
+            let startX, startY;
+
+            function onStart(e) {
+                isDragging = true;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                startX = clientX;
+                startY = clientY;
+                e.stopPropagation();
+            }
+
+            function onMove(e) {
+                if (!isDragging) return;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                startX = clientX;
+                startY = clientY;
+
+                const containerRect = containerElement.getBoundingClientRect();
+                let currentLeft = (element.offsetLeft || 0) + dx;
+                let currentTop = (element.offsetTop || 0) + dy;
+
+                let leftPercent = (currentLeft / containerRect.width) * 100;
+                let topPercent = (currentTop / containerRect.height) * 100;
+
+                leftPercent = Math.max(0, Math.min(85, leftPercent));
+                topPercent = Math.max(0, Math.min(85, topPercent));
+
+                itemObj.posX = leftPercent;
+                itemObj.posY = topPercent;
+
+                element.style.left = leftPercent + '%';
+                element.style.top = topPercent + '%';
+                element.style.transform = 'none';
+                e.stopPropagation();
+            }
+
+            function onEnd() {
+                if (isDragging) {
+                    isDragging = false;
+                    saveAllSystemData();
+                }
+            }
+
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            element.addEventListener('touchstart', onStart, {passive: true});
+            window.addEventListener('touchmove', onMove, {passive: true});
+            window.addEventListener('touchend', onEnd);
+        }
+
+        function buildOverlayHtml(item) {
+            if (!item.src) return '';
+            if (!item.text || item.text.trim() === '') return `<img src="${item.src}" class="image-display">`;
+
+            const bg = item.bgColor || 'rgba(0,0,0,0.85)';
+            const color = item.textColor || '#ffffff';
+            const font = item.fontFamily || "'Heebo', sans-serif";
+            
+            let posStyle = '';
+            if (item.posX !== undefined && item.posY !== undefined) {
+                posStyle = `left: ${item.posX}%; top: ${item.posY}%; transform: none;`;
+            } else {
+                posStyle = `top: 50%; left: 50%; transform: translate(-50%, -50%);`;
+            }
+
+            const overlayId = 'overlay_' + Math.random().toString(36).substring(2);
+            setTimeout(() => {
+                const el = document.getElementById(overlayId);
+                const container = el?.closest('.img-overlay-container');
+                if (el && container) {
+                    makeElementDraggable(el, item, container);
+                }
+            }, 50);
+
+            return `
+                <div class="img-overlay-container">
+                    <img src="${item.src}" class="image-display">
+                    <div id="${overlayId}" class="img-overlay-text" style="background: ${bg}; color: ${color}; font-family: ${font}; ${posStyle}">${item.text}</div>
+                </div>
+            `;
+        }
+
         function buildSlides() {
             const display = document.getElementById('mainDisplay');
             if(!display) return;
@@ -770,18 +892,10 @@
                         if (corner.active !== false) {
                             const cornerSlide = document.createElement('div'); cornerSlide.className = 'slide';
                             let cornerContent = '';
-                            if (corner.src && corner.text && corner.text.trim() !== '') {
-                                cornerContent = `
-                                    <div class="img-overlay-container">
-                                        <img src="${corner.src}">
-                                        <div class="img-overlay-text style-${corner.style || 'classic'}">${corner.text}</div>
-                                    </div>
-                                `;
+                            if (corner.src) {
+                                cornerContent = buildOverlayHtml(corner);
                             } else {
-                                cornerContent = `
-                                    ${corner.text ? `<div class="custom-box">${corner.text}</div>` : ''}
-                                    ${corner.src ? `<img src="${corner.src}" class="image-display" style="margin-top:6px;">` : ''}
-                                `;
+                                cornerContent = corner.text ? `<div class="custom-box">${corner.text}</div>` : '';
                             }
                             cornerSlide.innerHTML = createSlideHtml('customCorners', corner.title || 'פינה מותאמת אישית', cornerContent);
                             display.appendChild(cornerSlide); slides.push(cornerSlide);
@@ -805,17 +919,7 @@
                 if (secKey === 'gallery') {
                     gallery.forEach(item => {
                         const galSlide = document.createElement('div'); galSlide.className = 'slide';
-                        let galContent = '';
-                        if (item.caption && item.caption.trim() !== '') {
-                            galContent = `
-                                <div class="img-overlay-container">
-                                    <img src="${item.src}">
-                                    <div class="img-overlay-text style-${item.style || 'classic'}">${item.caption}</div>
-                                </div>
-                            `;
-                        } else {
-                            galContent = `<img src="${item.src}" class="image-display">`;
-                        }
+                        let galContent = buildOverlayHtml(item);
                         galSlide.innerHTML = createSlideHtml('gallery', galleryMainTitle, galContent);
                         display.appendChild(galSlide); slides.push(galSlide);
                     });
@@ -825,6 +929,8 @@
             if (slides.length > 0) {
                 if (currentSlideIndex >= slides.length) currentSlideIndex = 0;
                 showSlide(currentSlideIndex);
+            } else {
+                display.innerHTML = `<div style="text-align:center; padding:20px;"><h2>המערכת מוכנה</h2><p>לחץ על גלגל השיניים ⚙️ בפינה כדי להוסיף תוכן</p></div>`;
             }
         }
 
@@ -951,6 +1057,21 @@
             `).join('');
         }
 
+        const fontOptionsList = `
+            <option value="'Heebo', sans-serif">היבו (מודרני)</option>
+            <option value="'Assistant', sans-serif">אסיסטנט (נקי)</option>
+            <option value="'Varela Round', sans-serif">וורלה (מעוגל)</option>
+            <option value="'Frank Ruhl Libre', serif">פרנק ריהל (תורני)</option>
+        `;
+
+        const bgOptionsList = `
+            <option value="rgba(0,0,0,0.85)">שחור כהה קלאסי</option>
+            <option value="linear-gradient(135deg, #0f172a, #1e3a8a)">כחול יוקרתי (ראש חודש)</option>
+            <option value="rgba(245, 158, 11, 0.9)">זהב / חרדל בולט</option>
+            <option value="rgba(6, 78, 59, 0.9)">ירוק עמוק</option>
+            <option value="rgba(255,255,255,0.92)">לבן בהיר נקי</option>
+        `;
+
         function renderCustomCornersAdmin() {
             const container = document.getElementById('customCornersContainer'); if(!container) return;
             container.innerHTML = customCorners.map((corner, idx) => `
@@ -959,13 +1080,32 @@
                     <label><input type="checkbox" class="cc-active" ${corner.active !== false ? 'checked' : ''}> הצג שקופית זו</label>
                     <label>כותרת הפינה:</label><input type="text" class="cc-title" value="${corner.title || ''}">
                     <label>טקסט להצגה על התמונה:</label><textarea class="cc-text">${corner.text || ''}</textarea>
-                    <label>סגנון עיצוב הטקסט על התמונה:</label>
-                    <select class="cc-style">
-                        <option value="classic" ${corner.style==='classic'?'selected':''}>קלאסי (מרכז)</option>
-                        <option value="ribbon" ${corner.style==='ribbon'?'selected':''}>סרט (תחתון)</option>
-                        <option value="elegant" ${corner.style==='elegant'?'selected':''}>אלגנטי (בהיר)</option>
-                        <option value="corner" ${corner.style==='corner'?'selected':''}>מודרני (פינה)</option>
-                    </select>
+                    
+                    <div class="grid-2col">
+                        <div>
+                            <label>תמה / צבע רקע:</label>
+                            <select class="cc-bgcolor">
+                                ${bgOptionsList.replace(`value="${corner.bgColor}"`, `value="${corner.bgColor}" selected`)}
+                            </select>
+                        </div>
+                        <div>
+                            <label>גופן (סגנון כתיבה):</label>
+                            <select class="cc-font">
+                                ${fontOptionsList.replace(`value="${corner.fontFamily}"`, `value="${corner.fontFamily}" selected`)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col">
+                        <div><label>מיקום אופקי X (%):</label><input type="number" min="0" max="100" class="cc-posx" value="${corner.posX !== undefined ? corner.posX : 50}"></div>
+                        <div><label>מיקום אנכי Y (%):</label><input type="number" min="0" max="100" class="cc-posy" value="${corner.posY !== undefined ? corner.posY : 50}"></div>
+                    </div>
+
+                    <div>
+                        <label>צבע טקסט:</label>
+                        <input type="color" class="cc-textcolor" value="${corner.textColor || '#ffffff'}">
+                    </div>
+
                     <input type="file" accept="image/*" id="ccFile_${idx}" style="display:none;" onchange="if(this.files[0]){let r=new FileReader();r.onload=e=>{customCorners[${idx}].src=e.target.result;renderCustomCornersAdmin();};r.readAsDataURL(this.files[0]);}">
                     <button class="btn-action btn-info" onclick="document.getElementById('ccFile_${idx}').click()">📁 בחר תמונה</button>
                     ${corner.src ? `<img src="${corner.src}" style="max-height: 70px; object-fit: contain; margin-top: 5px;">` : ''}
@@ -980,13 +1120,31 @@
                     <div class="gallery-admin-card-header"><strong>תמונה #${idx+1}</strong><button class="btn-action btn-danger" onclick="gallery.splice(${idx},1);renderGalleryAdminItems();">מחק</button></div>
                     <img src="${g.src}" style="max-height:80px; object-fit:contain;">
                     <label>כיתוב על גבי התמונה:</label><input type="text" class="gal-caption" value="${g.caption || ''}">
-                    <label>סגנון עיצוב:</label>
-                    <select class="gal-style">
-                        <option value="classic" ${g.style==='classic'?'selected':''}>קלאסי (מרכז)</option>
-                        <option value="ribbon" ${g.style==='ribbon'?'selected':''}>סרט (תחתון)</option>
-                        <option value="elegant" ${g.style==='elegant'?'selected':''}>אלגנטי (בהיר)</option>
-                        <option value="corner" ${g.style==='corner'?'selected':''}>מודרני (פינה)</option>
-                    </select>
+                    
+                    <div class="grid-2col">
+                        <div>
+                            <label>תמה / צבע רקע:</label>
+                            <select class="gal-bgcolor">
+                                ${bgOptionsList.replace(`value="${g.bgColor}"`, `value="${g.bgColor}" selected`)}
+                            </select>
+                        </div>
+                        <div>
+                            <label>גופן (סגנון כתיבה):</label>
+                            <select class="gal-font">
+                                ${fontOptionsList.replace(`value="${g.fontFamily}"`, `value="${g.fontFamily}" selected`)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2col">
+                        <div><label>מיקום אופקי X (%):</label><input type="number" min="0" max="100" class="gal-posx" value="${g.posX !== undefined ? g.posX : 50}"></div>
+                        <div><label>מיקום אנכי Y (%):</label><input type="number" min="0" max="100" class="gal-posy" value="${g.posY !== undefined ? g.posY : 50}"></div>
+                    </div>
+
+                    <div>
+                        <label>צבע טקסט:</label>
+                        <input type="color" class="gal-textcolor" value="${g.textColor || '#ffffff'}">
+                    </div>
                 </div>
             `).join('');
         }
@@ -995,7 +1153,7 @@
         function handleGalleryImageUpload(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader(); reader.onload = e => {
-                    gallery.push({ id: Date.now(), src: e.target.result, caption: '', style: 'classic' });
+                    gallery.push({ id: Date.now(), src: e.target.result, caption: '', bgColor: 'rgba(0,0,0,0.85)', textColor: '#ffffff', fontFamily: "'Heebo', sans-serif", posX: 50, posY: 50 });
                     renderGalleryAdminItems(); buildSlides(); input.value = '';
                 };
                 reader.readAsDataURL(input.files[0]);
@@ -1029,7 +1187,7 @@
         }
 
         function generateSystemBackup() {
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v4', 'mp_gallery_v4', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
             let data = {}; keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) data[k] = v; });
             const backupEl = document.getElementById('systemBackupInput');
             if(backupEl) backupEl.value = JSON.stringify(data, null, 2);
@@ -1044,19 +1202,29 @@
         }
 
         function exportCompleteHtmlFile() {
-            let docClone = document.documentElement.cloneNode(true);
-            let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v2', 'mp_gallery_v2', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
-            let data = {}; keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) data[k] = v; });
-            docClone.querySelector('body').insertAdjacentHTML('beforeend', `<script>const savedData = ${JSON.stringify(data)}; for (let k in savedData) localStorage.setItem(k, savedData[k]);<\/script>`);
-            const blob = new Blob(["<!DOCTYPE html>\n" + docClone.outerHTML], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob); const a = document.createElement('a');
-            a.href = url; a.download = 'beit_midrash_final.html'; a.click(); URL.revokeObjectURL(url);
+            try {
+                let docClone = document.documentElement.cloneNode(true);
+                let keys = ['mp_header_config', 'mp_halacha_config', 'mp_section_titles', 'mp_slide_title_configs', 'mp_section_order', 'mp_weekday_times_v4', 'mp_shabbat_data_v3', 'mp_shiurim_by_days_v3', 'mp_custom_corners_v4', 'mp_gallery_v4', 'mp_gallery_main_title', 'mp_donation_img', 'mp_interval', 'mp_halacha', 'mp_admin_password', 'mp_firebase_config', 'mp_rc_config'];
+                let data = {}; keys.forEach(k => { let v = localStorage.getItem(k); if (v !== null) data[k] = v; });
+                docClone.querySelector('body').insertAdjacentHTML('beforeend', `<script>const savedData = ${JSON.stringify(data)}; for (let k in savedData) localStorage.setItem(k, savedData[k]);<\/script>`);
+                const blob = new Blob(["<!DOCTYPE html>\n" + docClone.outerHTML], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob); 
+                const a = document.createElement('a');
+                a.href = url; 
+                a.download = 'beit_midrash_final.html'; 
+                document.body.appendChild(a);
+                a.click(); 
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                alert("אירעה שגיאה בהורדת הקובץ: " + e.message);
+            }
         }
 
         function addWeekdayItem() { weekdayTimes.push({ title: 'חדש', time: '00:00', fontSize: 1.6, isAutoSunset: false, sunsetOffset: -20 }); renderWeekdayAdminItems(); }
         function addShabbatItem(d) { shabbatData[d==='friday'?'fridayItems':'saturdayItems'].push({ title: 'חדש', time: '00:00', fontSize: 1.6 }); renderShabbatAdminItems(); }
         function addNewShiurBox() { shiurimByDays.push({ day: 'יום ראשון', time: '', location: '', src: '' }); renderShiurimAdminItems(); }
-        function addCustomCornerBox() { customCorners.push({ active: true, title: 'פינה חדשה', text: '', src: '', style: 'classic' }); renderCustomCornersAdmin(); }
+        function addCustomCornerBox() { customCorners.push({ active: true, title: 'פינה חדשה', text: '', src: '', bgColor: 'rgba(0,0,0,0.85)', textColor: '#ffffff', fontFamily: "'Heebo', sans-serif", posX: 50, posY: 50 }); renderCustomCornersAdmin(); }
     </script>
 </body>
 </html>
