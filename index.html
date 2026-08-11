@@ -170,8 +170,11 @@
                 <button class="btn-action btn-danger" onclick="closeAdminModal()">סגור ✕</button>
             </div>
 
-            <!-- Master Save Button -->
-            <button class="btn-action btn-success" style="width: 100%; font-size: 1.1rem; padding: 14px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);" onclick="saveAllSystemData()">💾 שמור את כל השינויים במערכת (שמירה ראשית)</button>
+            <!-- Master Save Button with On-Screen Status Indicator -->
+            <div style="margin-bottom: 20px;">
+                <button class="btn-action btn-success" style="width: 100%; font-size: 1.1rem; padding: 14px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);" onclick="saveAllSystemData()">💾 שמור את כל השינויים במערכת (שמירה ראשית)</button>
+                <div id="masterSaveStatus" style="text-align: center; margin-top: 8px; font-weight: bold; font-size: 0.95rem; color: #34d399; display: none;"></div>
+            </div>
 
             <div class="admin-section" style="background: #1e1b4b; border: 2px solid #6366f1;">
                 <h3 style="color: #818cf8; margin-top:0;">💾 גיבוי ושחזור נתוני המערכת</h3>
@@ -431,7 +434,6 @@
         
         let sectionTitles = JSON.parse(localStorage.getItem('mp_section_titles')) || { weekday: 'זמני תפילות ימי חול', shabbat: 'זמני שבת קודש', shiurim: 'שיעורים מרכזיים בבית המדרש', donation: 'לתרומות לאחזקת בית המדרש', halacha: 'הלכה יומית' };
         
-        // Per-slide title custom configurations
         let slideTitleConfigs = JSON.parse(localStorage.getItem('mp_slide_title_configs')) || {
             weekday: { title: 'זמני תפילות ימי חול', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
             shabbat: { title: 'זמני שבת קודש', fontSize: 1.3, align: 'center', verticalPos: 'top', margin: 8 },
@@ -604,7 +606,6 @@
             };
             firebaseDb.ref('board_state').set(fullState).catch((err) => {
                 console.error("Firebase sync error:", err);
-                alert("שגיאה בסנכרון לענן. ודא שכללי האבטחה (Security Rules) ב-Firebase מוגדרים לאפשר קריאה וכתיבה.");
             });
         }
 
@@ -629,7 +630,6 @@
         }
 
         function saveAllSystemData() {
-            // Save all current sections from local state/inputs
             localStorage.setItem('mp_header_config', JSON.stringify(headerConfig));
             localStorage.setItem('mp_halacha_config', JSON.stringify(halachaConfig));
             localStorage.setItem('mp_section_titles', JSON.stringify(sectionTitles));
@@ -646,7 +646,17 @@
             localStorage.setItem('mp_rc_config', JSON.stringify(roshChodeshConfig));
 
             syncAllDataToCloud();
-            alert('כל שינויי המערכת נשמרו בהצלחה והועלו לענן!');
+
+            // Show visual on-screen success message
+            const statusEl = document.getElementById('masterSaveStatus');
+            if (statusEl) {
+                statusEl.innerText = '✔️ כל שינויי המערכת נשמרו בהצלחה והועלו לענן!';
+                statusEl.style.display = 'block';
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 4000);
+            }
+
             buildSlides();
         }
 
@@ -730,7 +740,6 @@
                                 <p>${rcTextToShow}</p>
                             </div>
                         `;
-                        // Using weekday slide config or default for rosh chodesh
                         rcSlide.innerHTML = createSlideHtml('weekday', roshChodeshConfig.title || 'הודעה מיוחדת לשבוע זה', rcContent);
                         display.appendChild(rcSlide); slides.push(rcSlide);
                     }
